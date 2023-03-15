@@ -97,4 +97,22 @@ public class BookingServiceImpl implements BookingService{
 
         return true;
     }
+
+    @Override
+    public void deleteBooking(String bookingId, String userId, String restaurantId) {
+
+        UserModel user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+
+        RestaurantModel restaurant = restaurantRepository
+                .findById(restaurantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "restaurantId", restaurantId));
+
+        BookingModel booking = bookingRepository
+                .findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking", "bookingId", bookingId));
+
+        bookingRepository.delete(booking);
+    }
 }

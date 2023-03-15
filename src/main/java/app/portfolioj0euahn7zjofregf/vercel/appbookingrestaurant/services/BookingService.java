@@ -8,4 +8,6 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserMo
 public interface BookingService {
 
     public boolean createBooking(BookingDTO booking, String restaurantId, String userId);
+
+    public void deleteBooking(String bookingId, String userId, String restaurantId);
 }

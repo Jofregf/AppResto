@@ -28,4 +28,13 @@ public class BookingController {
             return ResponseEntity.badRequest().body("Booking creation failed!!");
         }
     }
+
+    @DeleteMapping("/user/{userId}/restaurant/{restaurantId}/booking/{bookingId}")
+    public ResponseEntity<String> deleteBooking(@PathVariable String userId,
+                                                @PathVariable String restaurantId,
+                                                @PathVariable String bookingId){
+
+        bookingService.deleteBooking(bookingId, userId, restaurantId);
+        return new ResponseEntity<>("Booking deleted successfully", HttpStatus.OK);
+    }
 }

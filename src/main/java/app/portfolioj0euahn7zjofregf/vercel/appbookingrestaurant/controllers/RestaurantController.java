@@ -64,4 +64,9 @@ public class RestaurantController {
     public List<RestaurantDTO> listRestaurantsByMenu(@PathVariable String menuName){
         return restaurantService.findRestaurantsByMenuName(menuName);
     }
+
+    @GetMapping("/booking/{bookingId}/restaurant")
+    public RestaurantDTO findRestaurantByBooking(@PathVariable String bookingId){
+        return restaurantService.findRestaurantByBookingId(bookingId);
+    }
 }

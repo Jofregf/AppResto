@@ -12,8 +12,10 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.Us
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -64,15 +66,26 @@ public class BookingServiceImpl implements BookingService{
 
         BookingModel booking = mapEntity(bookingDTO);
 
+        LocalDateTime bookingDateTime = LocalDateTime.of(booking.getBookingDate(), booking.getBookingTime());
+
         LocalTime closingTime = restaurant.getClosingHoursRestaurant();
 
-        LocalDateTime bookingDateTime = LocalDateTime.of(booking.getBookingDate(), booking.getBookingTime());
+        LocalDateTime closingDateTime;
+
+        if(closingTime.isBefore(LocalTime.of(0,0))){
+            closingDateTime = LocalDateTime.of(booking.getBookingDate(), closingTime);
+        } else {
+            closingDateTime = LocalDateTime.of(booking.getBookingDate().plusDays(1), closingTime);
+        }
 
         if(!restaurant.getEnabled()){
             return false;
         }
+        System.out.println(bookingDateTime);
+        System.out.println(closingTime);
+        System.out.println(closingDateTime);
 
-        if(bookingDateTime.plusHours(1).toLocalTime().isAfter(closingTime)){
+        if (bookingDateTime.plusHours(1).isAfter(closingDateTime)) {
             return false;
         }
 
@@ -158,5 +171,29 @@ public class BookingServiceImpl implements BookingService{
         BookingModel bookingUpdated = bookingRepository.save(booking);
 
         return mapDTO(bookingUpdated);
+    }
+
+    @Override
+    public List<BookingDTO> findBookingByUserId(String userId) {
+
+        List<BookingModel> bookings = bookingRepository.findByUser_UserId(userId);
+
+        return bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BookingDTO> findBookingByRestaurantId(String restaurantId) {
+
+        List<BookingModel> bookings = bookingRepository.findByRestaurant_RestaurantId(restaurantId);
+
+        return bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BookingDTO> findByBookingDate(LocalDate date) {
+
+        List<BookingModel> bookings = bookingRepository.findByBookingDate(date);
+
+        return bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
     }
 }

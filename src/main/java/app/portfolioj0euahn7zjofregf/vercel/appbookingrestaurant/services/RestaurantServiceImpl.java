@@ -180,4 +180,12 @@ public class RestaurantServiceImpl implements RestaurantService{
         List<RestaurantModel> restaurants = restaurantRepository.findByMenus_MenuName(menuName);
         return restaurants.stream().map(restaurant -> mapDTO(restaurant)).collect(Collectors.toList());
     }
+
+    @Override
+    public RestaurantDTO findRestaurantByBookingId(String bookingId) {
+
+        RestaurantModel restaurant = restaurantRepository.findByBookings_BookingId(bookingId);
+
+        return mapDTO(restaurant);
+    }
 }

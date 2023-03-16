@@ -23,4 +23,6 @@ public interface RestaurantService {
 
     List<RestaurantDTO> findRestaurantsByMenuName(String menuName);
 
+    public RestaurantDTO findRestaurantByBookingId(String bookingId);
+
 }

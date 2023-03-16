@@ -8,4 +8,6 @@ import java.util.List;
 public interface RestaurantRepository extends JpaRepository<RestaurantModel, String> {
 
     public List<RestaurantModel> findByMenus_MenuName(String menuName);
+
+    public RestaurantModel findByBookings_BookingId(String BookingId);
 }

@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 public class BookingController {
@@ -21,6 +24,7 @@ public class BookingController {
                                            @RequestBody BookingDTO bookingDTO){
 
         boolean bookingCreated = bookingService.createBooking(bookingDTO, restaurantId, userId);
+        System.out.println(bookingCreated + " controller");
         if(bookingCreated){
             return ResponseEntity.ok("Booking created successfully");
         }
@@ -46,5 +50,20 @@ public class BookingController {
 
         BookingDTO bookingResponse = bookingService.updateBooking(bookingDTO, userId, restaurantId, bookingId);
         return new ResponseEntity<>(bookingResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/user/{userId}/booking")
+    public List<BookingDTO> listBookingByUserId(@PathVariable String userId){
+        return bookingService.findBookingByUserId(userId);
+    }
+
+    @GetMapping("/restaurant/{restaurantId}/booking")
+    public List<BookingDTO> listBookingByRestaurantId(@PathVariable String restaurantId){
+        return bookingService.findBookingByRestaurantId(restaurantId);
+    }
+
+    @GetMapping("/booking/date/{date}")
+    public List<BookingDTO> listBookingByDate(@PathVariable LocalDate date){
+        return bookingService.findByBookingDate(date);
     }
 }

@@ -37,4 +37,14 @@ public class BookingController {
         bookingService.deleteBooking(bookingId, userId, restaurantId);
         return new ResponseEntity<>("Booking deleted successfully", HttpStatus.OK);
     }
+
+    @PutMapping("/user/{userId}/restaurant/{restaurantId}/booking/{bookingId}")
+    public ResponseEntity<BookingDTO> updateBooking(@PathVariable String userId,
+                                                    @PathVariable String restaurantId,
+                                                    @PathVariable String bookingId,
+                                                    @RequestBody BookingDTO bookingDTO){
+
+        BookingDTO bookingResponse = bookingService.updateBooking(bookingDTO, userId, restaurantId, bookingId);
+        return new ResponseEntity<>(bookingResponse, HttpStatus.OK);
+    }
 }

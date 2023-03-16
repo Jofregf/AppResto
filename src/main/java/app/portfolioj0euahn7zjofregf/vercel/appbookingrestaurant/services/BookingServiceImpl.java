@@ -4,6 +4,7 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.BookingDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.BookingModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.CapacityExceededException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.ResourceNotFoundException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.BookingRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.RestaurantRepository;
@@ -74,8 +75,6 @@ public class BookingServiceImpl implements BookingService{
         if(bookingDateTime.plusHours(1).toLocalTime().isAfter(closingTime)){
             return false;
         }
-//        LocalDateTime bookingDateTime = booking.getBookingDate().atTime(booking.getBookingTime());
-
 
         Set<BookingModel> existingBooking = restaurant.getBookings().stream()
                 .filter(book -> book.getBookingDate().equals(booking.getBookingDate()) &&
@@ -114,5 +113,50 @@ public class BookingServiceImpl implements BookingService{
                 .orElseThrow(() -> new ResourceNotFoundException("Booking", "bookingId", bookingId));
 
         bookingRepository.delete(booking);
+    }
+
+    @Override
+    public BookingDTO updateBooking(BookingDTO bookingDTO, String userId, String restaurantId, String bookingId) {
+
+        UserModel user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+
+        RestaurantModel restaurant = restaurantRepository
+                .findById(restaurantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "restaurantId", restaurantId));
+
+        BookingModel booking = bookingRepository
+                .findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking", "bookingId", bookingId));
+
+        int totalCapacity = restaurant.getRestaurantCapacity();
+
+        Set<BookingModel> existingBooking = restaurant
+                .getBookings()
+                .stream()
+                .filter(book -> book.getBookingDate().equals(bookingDTO.getBookingDate()) &&
+                        book.getBookingTime().equals(bookingDTO.getBookingTime()) &&
+                        !book.getBookingId().equals(bookingId))
+                .collect(Collectors.toSet());
+
+        int usedCapacity = existingBooking
+                .stream()
+                .mapToInt(BookingModel::getBookingPartySize)
+                .sum();
+
+        int availableCapacity = totalCapacity - usedCapacity;
+
+        if(bookingDTO.getBookingPartySize() > availableCapacity){
+            throw new CapacityExceededException("There is not enough capacity in the restaurant to make the reservation");
+        }
+
+        booking.setBookingDate(bookingDTO.getBookingDate());
+        booking.setBookingTime(bookingDTO.getBookingTime());
+        booking.setBookingPartySize(bookingDTO.getBookingPartySize());
+
+        BookingModel bookingUpdated = bookingRepository.save(booking);
+
+        return mapDTO(bookingUpdated);
     }
 }

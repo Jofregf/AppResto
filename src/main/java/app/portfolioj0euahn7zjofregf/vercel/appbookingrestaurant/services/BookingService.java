@@ -10,4 +10,6 @@ public interface BookingService {
     public boolean createBooking(BookingDTO booking, String restaurantId, String userId);
 
     public void deleteBooking(String bookingId, String userId, String restaurantId);
+
+    public BookingDTO updateBooking(BookingDTO DTO, String userId, String restaurantId, String bookingId);
 }

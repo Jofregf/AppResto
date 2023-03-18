@@ -2,8 +2,6 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantResponse;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.ReviewDTO;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserDTO;
 
 import java.util.List;
 

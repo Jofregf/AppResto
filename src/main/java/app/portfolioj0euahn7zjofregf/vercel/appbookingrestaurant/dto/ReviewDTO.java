@@ -1,7 +1,5 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
-
-
 public class ReviewDTO {
 
     private String reviewId;

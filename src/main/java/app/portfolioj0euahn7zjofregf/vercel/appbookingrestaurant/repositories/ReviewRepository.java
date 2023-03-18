@@ -1,6 +1,5 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories;
 
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.ReviewModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

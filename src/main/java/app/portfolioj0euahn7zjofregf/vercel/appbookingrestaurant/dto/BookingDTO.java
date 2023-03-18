@@ -1,7 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class BookingDTO {

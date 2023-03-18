@@ -1,7 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.BookingDTO;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.BookingModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,11 +19,11 @@ public class BookingController {
 
     @PostMapping("/user/{userId}/restaurant/{restaurantId}/booking")
     public ResponseEntity<String> createBooking(@PathVariable String userId,
-                                           @PathVariable String restaurantId,
-                                           @RequestBody BookingDTO bookingDTO){
+                                                @PathVariable String restaurantId,
+                                                @RequestBody BookingDTO bookingDTO){
 
         boolean bookingCreated = bookingService.createBooking(bookingDTO, restaurantId, userId);
-        System.out.println(bookingCreated + " controller");
+
         if(bookingCreated){
             return ResponseEntity.ok("Booking created successfully");
         }

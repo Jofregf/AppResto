@@ -2,14 +2,12 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantResponse;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.ResourceNotFoundException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.RestaurantRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.ReviewRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,8 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -178,14 +176,24 @@ public class RestaurantServiceImpl implements RestaurantService{
     public List<RestaurantDTO> findRestaurantsByMenuName(String menuName) {
 
         List<RestaurantModel> restaurants = restaurantRepository.findByMenus_MenuName(menuName);
-        return restaurants.stream().map(restaurant -> mapDTO(restaurant)).collect(Collectors.toList());
+
+        List<RestaurantDTO> listRestaurants = restaurants.stream().map(restaurant -> mapDTO(restaurant)).collect(Collectors.toList());
+
+        if(listRestaurants.isEmpty()){
+            throw new ResourceNotFoundException("Restaurant", "menuName", menuName);
+        }
+        return listRestaurants;
     }
 
     @Override
     public RestaurantDTO findRestaurantByBookingId(String bookingId) {
 
-        RestaurantModel restaurant = restaurantRepository.findByBookings_BookingId(bookingId);
+        Optional<RestaurantModel> restaurant = Optional.ofNullable(restaurantRepository.findByBookings_BookingId(bookingId));
 
-        return mapDTO(restaurant);
+        if(restaurant.isPresent()){
+            return mapDTO(restaurant.get());
+        } else {
+            throw new ResourceNotFoundException("Restaurant", "bookingId", bookingId);
+        }
     }
 }

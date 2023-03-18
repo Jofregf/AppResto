@@ -3,8 +3,6 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import java.util.List;
-
 @Entity
 @Table(name = "menus")
 public class MenuModel {

@@ -1,7 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.MenuDTO;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.MenuModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.ResourceNotFoundException;
@@ -107,6 +106,12 @@ public class MenuServiceImpl implements MenuService{
 
         List<MenuModel> menus = menuRepository.findByRestaurant_RestaurantId(restaurantId);
 
-        return menus.stream().map(menu -> mapDTO(menu)).collect(Collectors.toList());
+        List<MenuDTO> listMenus = menus.stream().map(menu -> mapDTO(menu)).collect(Collectors.toList());
+
+        if(listMenus.isEmpty()){
+            throw new ResourceNotFoundException("Menu", "restaurantId", restaurantId);
+        }
+
+        return listMenus;
     }
 }

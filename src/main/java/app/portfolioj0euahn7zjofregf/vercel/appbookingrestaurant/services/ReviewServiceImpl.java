@@ -143,13 +143,25 @@ public class ReviewServiceImpl implements ReviewService{
     public List<ReviewDTO> findReviewsByRestaurantId(String restaurantId) {
 
         List<ReviewModel> reviews = reviewRepository.findByRestaurant_RestaurantId(restaurantId);
-        return reviews.stream().map(review -> mapDTO(review)).collect(Collectors.toList());
+
+        List<ReviewDTO> listReviews = reviews.stream().map(review -> mapDTO(review)).collect(Collectors.toList());
+
+        if(listReviews.isEmpty()){
+            throw new ResourceNotFoundException("Reviews", "restaurantId", restaurantId);
+        }
+        return listReviews;
     }
 
     @Override
     public List<ReviewDTO> findReviewsByUserId(String userId) {
 
         List<ReviewModel> reviews = reviewRepository.findByUser_UserId(userId);
-        return reviews.stream().map(review -> mapDTO(review)).collect(Collectors.toList());
+
+        List<ReviewDTO> listReviews = reviews.stream().map(review -> mapDTO(review)).collect(Collectors.toList());
+
+        if(listReviews.isEmpty()){
+            throw new ResourceNotFoundException("Reviews", "userId", userId);
+        }
+        return listReviews;
     }
 }

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 

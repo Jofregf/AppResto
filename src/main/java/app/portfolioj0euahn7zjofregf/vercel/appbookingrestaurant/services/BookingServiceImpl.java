@@ -81,9 +81,6 @@ public class BookingServiceImpl implements BookingService{
         if(!restaurant.getEnabled()){
             return false;
         }
-        System.out.println(bookingDateTime);
-        System.out.println(closingTime);
-        System.out.println(closingDateTime);
 
         if (bookingDateTime.plusHours(1).isAfter(closingDateTime)) {
             return false;
@@ -178,7 +175,13 @@ public class BookingServiceImpl implements BookingService{
 
         List<BookingModel> bookings = bookingRepository.findByUser_UserId(userId);
 
-        return bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
+        List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
+
+        if(listBookings.isEmpty()){
+            throw new ResourceNotFoundException("Bookings", "userId", userId);
+        }
+
+        return listBookings;
     }
 
     @Override
@@ -186,7 +189,13 @@ public class BookingServiceImpl implements BookingService{
 
         List<BookingModel> bookings = bookingRepository.findByRestaurant_RestaurantId(restaurantId);
 
-        return bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
+        List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
+
+        if(listBookings.isEmpty()){
+            throw new ResourceNotFoundException("Bookings", "restaurantId", restaurantId);
+        }
+
+        return listBookings;
     }
 
     @Override
@@ -194,6 +203,12 @@ public class BookingServiceImpl implements BookingService{
 
         List<BookingModel> bookings = bookingRepository.findByBookingDate(date);
 
-        return bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
+        List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
+
+        if(listBookings.isEmpty()){
+            throw new ResourceNotFoundException("Bookings", "date", date);
+        }
+
+        return listBookings;
     }
 }

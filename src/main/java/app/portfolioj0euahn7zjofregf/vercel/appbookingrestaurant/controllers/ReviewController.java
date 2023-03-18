@@ -16,7 +16,7 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
-    @PostMapping("/user/{userId}/{restaurantId}/review")
+    @PostMapping("/user/{userId}/restaurant/{restaurantId}/review")
     public ResponseEntity<ReviewDTO> saveReview(@PathVariable(value = "userId")String userId,
                                                 @PathVariable(value = "restaurantId")String restaurantId,
                                                 @RequestBody ReviewDTO reviewDTO){
@@ -28,6 +28,7 @@ public class ReviewController {
     public ResponseEntity<ReviewDTO> updateReview(@PathVariable String reviewId,
                                                   @PathVariable String userId,
                                                   @RequestBody ReviewDTO reviewDTO){
+
         ReviewDTO reviewResponse = reviewService.updateReview(reviewId, reviewDTO, userId);
         return new ResponseEntity<>(reviewResponse, HttpStatus.OK);
     }

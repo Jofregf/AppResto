@@ -26,8 +26,10 @@ public class RestaurantController {
 
     @GetMapping("/restaurants")
     public RestaurantResponse restaurantsList(@RequestParam(value = "pageNumber", defaultValue = "0", required = false)int pageNumber,
-                                              @RequestParam(value = "pageSize", defaultValue = "9", required = false) int pageSize){
-        return restaurantService.getRestaurants(pageNumber, pageSize);
+                                              @RequestParam(value = "pageSize", defaultValue = "9", required = false) int pageSize,
+                                              @RequestParam(value = "sortBy", defaultValue = "restaurantName", required = false) String orderBy,
+                                              @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir){
+        return restaurantService.getRestaurants(pageNumber, pageSize, orderBy, sortDir);
     }
 
     @GetMapping("/restaurant/{restaurantId}")

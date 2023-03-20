@@ -83,7 +83,7 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public RestaurantResponse getRestaurants(int pageNumber, int pageSize) {
+    public RestaurantResponse getRestaurants(int pageNumber, int pageSize, String orderBy, String sortDir) {
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("restaurantName"));
 

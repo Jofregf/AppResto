@@ -83,9 +83,13 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public RestaurantResponse getRestaurants(int pageNumber, int pageSize, String orderBy, String sortDir) {
+    public RestaurantResponse getRestaurants(int pageNumber, int pageSize, String sortBy, String sortDir) {
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("restaurantName"));
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())?
+                Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
         Page<RestaurantModel> restaurants = restaurantRepository.findAll(pageable);
 
@@ -175,7 +179,7 @@ public class RestaurantServiceImpl implements RestaurantService{
     @Override
     public List<RestaurantDTO> findRestaurantsByMenuName(String menuName) {
 
-        List<RestaurantModel> restaurants = restaurantRepository.findByMenus_MenuName(menuName);
+        List<RestaurantModel> restaurants = restaurantRepository.findByMenus_MenuNameContainingIgnoreCase(menuName);
 
         List<RestaurantDTO> listRestaurants = restaurants.stream().map(restaurant -> mapDTO(restaurant)).collect(Collectors.toList());
 

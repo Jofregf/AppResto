@@ -9,7 +9,7 @@ public interface RestaurantService {
 
     public RestaurantDTO createRestaurant(String userId, RestaurantDTO restaurantDTO);
 
-    public RestaurantResponse getRestaurants(int pageNumber, int pageSize, String orderBy, String sortDir);
+    public RestaurantResponse getRestaurants(int pageNumber, int pageSize, String sortBy, String sortDir);
 
     public RestaurantDTO getRestaurantById(String restaurantId);
 

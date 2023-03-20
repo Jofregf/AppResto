@@ -3,12 +3,14 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantResponse;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.RestaurantService;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.utilities.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api")
@@ -25,11 +27,12 @@ public class RestaurantController {
     }
 
     @GetMapping("/restaurants")
-    public RestaurantResponse restaurantsList(@RequestParam(value = "pageNumber", defaultValue = "0", required = false)int pageNumber,
-                                              @RequestParam(value = "pageSize", defaultValue = "9", required = false) int pageSize,
-                                              @RequestParam(value = "sortBy", defaultValue = "restaurantName", required = false) String orderBy,
-                                              @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir){
-        return restaurantService.getRestaurants(pageNumber, pageSize, orderBy, sortDir);
+    public RestaurantResponse restaurantsList(@RequestParam(value = "pageNumber", defaultValue = AppConstants.DEFAULT_NUMBER_PAGE, required = false)int pageNumber,
+                                              @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+                                              @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+                                              @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_BY_DIRECTION, required = false) String sortDir){
+
+        return restaurantService.getRestaurants(pageNumber, pageSize, sortBy, sortDir);
     }
 
     @GetMapping("/restaurant/{restaurantId}")
@@ -50,6 +53,7 @@ public class RestaurantController {
     public ResponseEntity<String> deleteRestaurant(@PathVariable String userId, @PathVariable String restaurantId){
         restaurantService.deleteRestaurant(userId, restaurantId);
         return new ResponseEntity<>("Restaurant deleted successfully", HttpStatus.OK);
+
     }
 
     @PutMapping("/admin/restaurant/{restaurantId}")

@@ -54,18 +54,11 @@ public class RestaurantModel {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ReviewModel> reviews = new HashSet<>();
 
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MenuModel> menus = new HashSet<>();
 
-    @OneToMany(mappedBy = "restaurant")
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookingModel> bookings = new HashSet<>();
-
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "userId")
-//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-//    private UserModel user;
-
-
 
     public RestaurantModel() {
     }

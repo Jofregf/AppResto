@@ -16,4 +16,6 @@ public interface MenuService {
 
     public List<MenuDTO> findMenuByRestaurantId(String restaurantId);
 
+    public List<MenuDTO> getMenuByName(String menuName);
+
 }

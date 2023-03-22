@@ -5,6 +5,7 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantR
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.ResourceNotFoundException;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.RestoAppException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.RestaurantRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.ReviewRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -73,7 +75,7 @@ public class RestaurantServiceImpl implements RestaurantService{
 
         UserModel user = userRepository
                 .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
         restaurant.setUser(user);
 
@@ -114,7 +116,7 @@ public class RestaurantServiceImpl implements RestaurantService{
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "restaurantId", restaurantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
 
         RestaurantDTO restaurantDTO = mapDTO(restaurant);
 
@@ -126,22 +128,24 @@ public class RestaurantServiceImpl implements RestaurantService{
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "restaurantId", restaurantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
 
         UserModel user = userRepository
                 .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-        if(userId.equals(restaurant.getUser().getUserId())){
-            restaurant.setRestaurantName(restaurantDTO.getRestaurantName());
-            restaurant.setRestaurantAddress(restaurantDTO.getRestaurantAddress());
-            restaurant.setRestaurantPhone(restaurantDTO.getRestaurantPhone());
-            restaurant.setRestaurantDescription(restaurantDTO.getRestaurantDescription());
-            restaurant.setOpeningHoursRestaurant(restaurantDTO.getOpeningHoursRestaurant());
-            restaurant.setClosingHoursRestaurant(restaurantDTO.getClosingHoursRestaurant());
-            restaurant.setRestaurantImages(restaurantDTO.getRestaurantImages());
-            restaurant.setRestaurantCapacity(restaurantDTO.getRestaurantCapacity());
+        if(!userId.equals(restaurant.getUser().getUserId())){
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The user is not the owner of the restaurant");
         }
+
+        restaurant.setRestaurantName(restaurantDTO.getRestaurantName());
+        restaurant.setRestaurantAddress(restaurantDTO.getRestaurantAddress());
+        restaurant.setRestaurantPhone(restaurantDTO.getRestaurantPhone());
+        restaurant.setRestaurantDescription(restaurantDTO.getRestaurantDescription());
+        restaurant.setOpeningHoursRestaurant(restaurantDTO.getOpeningHoursRestaurant());
+        restaurant.setClosingHoursRestaurant(restaurantDTO.getClosingHoursRestaurant());
+        restaurant.setRestaurantImages(restaurantDTO.getRestaurantImages());
+        restaurant.setRestaurantCapacity(restaurantDTO.getRestaurantCapacity());
 
         RestaurantModel restaurantUpdate = restaurantRepository.save(restaurant);
         return mapDTO(restaurantUpdate);
@@ -152,15 +156,16 @@ public class RestaurantServiceImpl implements RestaurantService{
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "restaurantId", restaurantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
 
         UserModel user = userRepository
                 .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-        if(userId.equals(restaurant.getUser().getUserId())){
-            restaurantRepository.delete(restaurant);
+        if(!userId.equals(restaurant.getUser().getUserId())){
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The user is not the owner of the restaurant");
         }
+        restaurantRepository.delete(restaurant);
     }
 
     @Override
@@ -168,7 +173,7 @@ public class RestaurantServiceImpl implements RestaurantService{
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "restaurantId", restaurantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
         restaurant.setEnabled(restaurantDTO.isEnabled());
 
         RestaurantModel updateRestaurant = restaurantRepository.save(restaurant);
@@ -184,7 +189,7 @@ public class RestaurantServiceImpl implements RestaurantService{
         List<RestaurantDTO> listRestaurants = restaurants.stream().map(restaurant -> mapDTO(restaurant)).collect(Collectors.toList());
 
         if(listRestaurants.isEmpty()){
-            throw new ResourceNotFoundException("Restaurant", "menuName", menuName);
+            throw new ResourceNotFoundException("Restaurant", "Menu name", menuName);
         }
         return listRestaurants;
     }
@@ -194,10 +199,10 @@ public class RestaurantServiceImpl implements RestaurantService{
 
         Optional<RestaurantModel> restaurant = Optional.ofNullable(restaurantRepository.findByBookings_BookingId(bookingId));
 
-        if(restaurant.isPresent()){
-            return mapDTO(restaurant.get());
-        } else {
-            throw new ResourceNotFoundException("Restaurant", "bookingId", bookingId);
+        if(!restaurant.isPresent()){
+            throw new ResourceNotFoundException("Restaurant", "Booking Id", bookingId);
         }
+
+        return mapDTO(restaurant.get());
     }
 }

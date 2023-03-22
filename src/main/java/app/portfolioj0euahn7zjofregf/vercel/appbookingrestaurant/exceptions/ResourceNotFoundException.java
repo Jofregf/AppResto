@@ -17,14 +17,14 @@ public class ResourceNotFoundException extends RuntimeException {
     private LocalDate fieldDate;
 
     public ResourceNotFoundException(String resourceName, String fieldName, String fieldValue) {
-        super(String.format("%s no encontrado con: %s : '%s'", resourceName, fieldName, fieldValue ));
+        super(String.format("%s Can't find by: %s : '%s'", resourceName, fieldName, fieldValue ));
         this.resourceName = resourceName;
         this.fieldName = fieldName;
         this.fieldValue = fieldValue;
     }
 
     public ResourceNotFoundException(String resourceName, String fieldName, LocalDate fieldDate){
-        super(String.format("%s no encontrado con: %s : '%s'", resourceName, fieldName, fieldDate ));
+        super(String.format("%s Can't find by: %s : '%s'", resourceName, fieldName, fieldDate ));
         this.resourceName = resourceName;
         this.fieldName = fieldName;
         this.fieldDate = fieldDate;

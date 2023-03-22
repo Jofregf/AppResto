@@ -6,10 +6,12 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.Restau
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.CapacityExceededException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.ResourceNotFoundException;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.RestoAppException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.BookingRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.RestaurantRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -58,11 +60,11 @@ public class BookingServiceImpl implements BookingService{
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "restaurantId", restaurantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
 
         UserModel user = userRepository
                 .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
         BookingModel booking = mapEntity(bookingDTO);
 
@@ -112,15 +114,19 @@ public class BookingServiceImpl implements BookingService{
 
         UserModel user = userRepository
                 .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "restaurantId", restaurantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
 
         BookingModel booking = bookingRepository
                 .findById(bookingId)
-                .orElseThrow(() -> new ResourceNotFoundException("Booking", "bookingId", bookingId));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking", "Id", bookingId));
+
+        if(!userId.equals(booking.getUser().getUserId()) || !restaurantId.equals(booking.getRestaurant().getRestaurantId())){
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The user or restaurant does not correspond to the booking");
+        }
 
         bookingRepository.delete(booking);
     }
@@ -130,15 +136,19 @@ public class BookingServiceImpl implements BookingService{
 
         UserModel user = userRepository
                 .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "restaurantId", restaurantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
 
         BookingModel booking = bookingRepository
                 .findById(bookingId)
-                .orElseThrow(() -> new ResourceNotFoundException("Booking", "bookingId", bookingId));
+                .orElseThrow(() -> new ResourceNotFoundException("Booking", "Id", bookingId));
+
+        if(!userId.equals(booking.getUser().getUserId()) || !restaurantId.equals(booking.getRestaurant().getRestaurantId())){
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The user or restaurant does not correspond to the booking");
+        }
 
         int totalCapacity = restaurant.getRestaurantCapacity();
 
@@ -178,7 +188,7 @@ public class BookingServiceImpl implements BookingService{
         List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
 
         if(listBookings.isEmpty()){
-            throw new ResourceNotFoundException("Bookings", "userId", userId);
+            throw new ResourceNotFoundException("Bookings", "User Id", userId);
         }
 
         return listBookings;
@@ -192,7 +202,7 @@ public class BookingServiceImpl implements BookingService{
         List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
 
         if(listBookings.isEmpty()){
-            throw new ResourceNotFoundException("Bookings", "restaurantId", restaurantId);
+            throw new ResourceNotFoundException("Bookings", "Restaurant Id", restaurantId);
         }
 
         return listBookings;
@@ -206,7 +216,7 @@ public class BookingServiceImpl implements BookingService{
         List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
 
         if(listBookings.isEmpty()){
-            throw new ResourceNotFoundException("Bookings", "date", date);
+            throw new ResourceNotFoundException("Bookings", "Date", date);
         }
 
         return listBookings;

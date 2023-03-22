@@ -4,9 +4,11 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.MenuDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.MenuModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.ResourceNotFoundException;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.RestoAppException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.MenuRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,7 +51,7 @@ public class MenuServiceImpl implements MenuService{
         MenuModel menu = mapEntity(menuDTO);
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "restaurantId", restaurantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
 
         menu.setRestaurant(restaurant);
 
@@ -63,11 +65,15 @@ public class MenuServiceImpl implements MenuService{
 
         MenuModel menu = menuRepository
                 .findById(menuId)
-                .orElseThrow(() -> new ResourceNotFoundException("Menu", "menuId", menuId));
+                .orElseThrow(() -> new ResourceNotFoundException("Menu", "Id", menuId));
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "restaurantId", restaurantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
+
+        if(!restaurantId.equals(menu.getRestaurant().getRestaurantId())){
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The menu does not correspond to the restaurant");
+        }
 
         menu.setMenuName(menuDTO.getMenuName());
         menu.setMenuDescription(menuDTO.getMenuDescription());
@@ -83,7 +89,7 @@ public class MenuServiceImpl implements MenuService{
 
         MenuModel menu = menuRepository
                 .findById(menuId)
-                .orElseThrow(() -> new ResourceNotFoundException("Menu", "menuId", menuId));
+                .orElseThrow(() -> new ResourceNotFoundException("Menu", "Id", menuId));
 
         return mapDTO(menu);
     }
@@ -92,11 +98,15 @@ public class MenuServiceImpl implements MenuService{
     public void deleteMenu(String restaurantId, String menuId) {
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "restaurantId", restaurantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
 
         MenuModel menu = menuRepository
                 .findById(menuId)
-                .orElseThrow(() -> new ResourceNotFoundException("Menu", "menuId", menuId));
+                .orElseThrow(() -> new ResourceNotFoundException("Menu", "Id", menuId));
+
+        if(!restaurantId.equals(menu.getRestaurant().getRestaurantId())){
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The menu does not correspond to the restaurant");
+        }
 
         menuRepository.delete(menu);
     }
@@ -109,7 +119,21 @@ public class MenuServiceImpl implements MenuService{
         List<MenuDTO> listMenus = menus.stream().map(menu -> mapDTO(menu)).collect(Collectors.toList());
 
         if(listMenus.isEmpty()){
-            throw new ResourceNotFoundException("Menu", "restaurantId", restaurantId);
+            throw new ResourceNotFoundException("Menu", "Restaurant Id", restaurantId);
+        }
+
+        return listMenus;
+    }
+
+    @Override
+    public List<MenuDTO> getMenuByName(String menuName) {
+
+        List<MenuModel> menus = menuRepository.findByMenuNameContainingIgnoreCase(menuName);
+
+        List<MenuDTO> listMenus = menus.stream().map(menu -> mapDTO(menu)).collect(Collectors.toList());
+
+        if(listMenus.isEmpty()){
+            throw new ResourceNotFoundException("Menu", "name", menuName);
         }
 
         return listMenus;

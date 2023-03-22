@@ -4,12 +4,13 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.ReviewDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.ReviewModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.ForbiddenException;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.RestoAppException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.ResourceNotFoundException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.RestaurantRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.ReviewRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -57,12 +58,11 @@ public class ReviewServiceImpl implements ReviewService{
 
         UserModel user = userRepository
                 .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "restaurantId", restaurantId));
-
+                        .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
 
         review.setUser(user);
 
@@ -84,31 +84,29 @@ public class ReviewServiceImpl implements ReviewService{
 
         ReviewModel review = reviewRepository
                 .findById(reviewId)
-                .orElseThrow(() -> new ResourceNotFoundException("Review", "reviewId", reviewId));
+                .orElseThrow(() -> new ResourceNotFoundException("Review", "Id", reviewId));
 
         UserModel user = userRepository
                 .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-        if(userId.equals(review.getUser().getUserId())) {
-            int oldRating = review.getRatingReview();
-            int newRating = reviewDTO.getRatingReview();
-            review.setRatingReview(newRating);
-            review.setCommentReview(reviewDTO.getCommentReview());
-            ReviewModel reviewUpdate = reviewRepository.save(review);
-
-            RestaurantModel restaurant = review.getRestaurant();
-            Double avgRating = reviewRepository.getAverageRatingForRestaurant(restaurant.getRestaurantId());
-            avgRating = avgRating == null ? 0.0 : avgRating;
-            restaurant.setAverageRanting(avgRating);
-            restaurantRepository.save(restaurant);
-
-            return mapDTO(reviewUpdate);
-        }
-        else {
-            throw new ForbiddenException("You don't have permission to delete this review.");
+        if(!userId.equals(review.getUser().getUserId())) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The review does not belong to the user.");
         }
 
+        int oldRating = review.getRatingReview();
+        int newRating = reviewDTO.getRatingReview();
+        review.setRatingReview(newRating);
+        review.setCommentReview(reviewDTO.getCommentReview());
+        ReviewModel reviewUpdate = reviewRepository.save(review);
+
+        RestaurantModel restaurant = review.getRestaurant();
+        Double avgRating = reviewRepository.getAverageRatingForRestaurant(restaurant.getRestaurantId());
+        avgRating = avgRating == null ? 0.0 : avgRating;
+        restaurant.setAverageRanting(avgRating);
+        restaurantRepository.save(restaurant);
+
+        return mapDTO(reviewUpdate);
     }
 
     @Override
@@ -116,18 +114,16 @@ public class ReviewServiceImpl implements ReviewService{
 
         ReviewModel review = reviewRepository
                 .findById(reviewId)
-                .orElseThrow(() -> new ResourceNotFoundException("Review", "reviewId", reviewId));
+                .orElseThrow(() -> new ResourceNotFoundException("Review", "Id", reviewId));
 
         UserModel user = userRepository
                 .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-        if(userId.equals(review.getUser().getUserId())){
-            reviewRepository.delete(review);
+        if(!userId.equals(review.getUser().getUserId())){
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The review does not belong to the user.");
         }
-        else {
-            throw new ForbiddenException("You don't have permission to delete this review.");
-        }
+        reviewRepository.delete(review);
     }
 
     @Override
@@ -147,8 +143,9 @@ public class ReviewServiceImpl implements ReviewService{
         List<ReviewDTO> listReviews = reviews.stream().map(review -> mapDTO(review)).collect(Collectors.toList());
 
         if(listReviews.isEmpty()){
-            throw new ResourceNotFoundException("Reviews", "restaurantId", restaurantId);
+            throw new ResourceNotFoundException("Reviews", "Id", restaurantId);
         }
+
         return listReviews;
     }
 
@@ -160,7 +157,7 @@ public class ReviewServiceImpl implements ReviewService{
         List<ReviewDTO> listReviews = reviews.stream().map(review -> mapDTO(review)).collect(Collectors.toList());
 
         if(listReviews.isEmpty()){
-            throw new ResourceNotFoundException("Reviews", "userId", userId);
+            throw new ResourceNotFoundException("Reviews", "Id", userId);
         }
         return listReviews;
     }

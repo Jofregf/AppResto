@@ -23,13 +23,7 @@ public class BookingController {
                                                 @RequestBody BookingDTO bookingDTO){
 
         boolean bookingCreated = bookingService.createBooking(bookingDTO, restaurantId, userId);
-
-        if(bookingCreated){
-            return ResponseEntity.ok("Booking created successfully");
-        }
-        else{
-            return ResponseEntity.badRequest().body("Booking creation failed!!");
-        }
+        return ResponseEntity.ok("Booking created successfully");
     }
 
     @DeleteMapping("/user/{userId}/restaurant/{restaurantId}/booking/{bookingId}")

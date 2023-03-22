@@ -1,11 +1,17 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalTime;
 import java.util.Arrays;
 
 public class RestaurantDTO {
 
     private String restaurantId;
+
+    @NotEmpty
+    @Size(min = 3, message = "The restaurant's name must have at least 2 characters")
     private String restaurantName;
     private String restaurantAddress;
     private String restaurantPhone;

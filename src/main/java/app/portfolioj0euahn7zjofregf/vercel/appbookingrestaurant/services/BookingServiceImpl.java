@@ -99,7 +99,8 @@ public class BookingServiceImpl implements BookingService{
         }
 
         if(totalCapacity + booking.getBookingPartySize() > restaurant.getRestaurantCapacity()){
-            return false;
+            throw new CapacityExceededException("There is not enough capacity in the restaurant to make the reservation");
+
         }
 
         booking.setRestaurant(restaurant);

@@ -41,7 +41,7 @@ public class RestaurantModel {
     @Column(name = "capacity", nullable = false)
     private int restaurantCapacity;
 
-    @Column(name = "restaurant_enabled", columnDefinition = "BOOLEAN DEFAULT true")
+    @Column(name = "restaurant_enabled", columnDefinition = "BOOLEAN DEFAULT false")
     private Boolean enabled;
 
     @Column(name = "average_rating")

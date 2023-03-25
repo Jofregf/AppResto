@@ -18,4 +18,7 @@ public interface BookingService {
     public List<BookingDTO> findBookingByRestaurantId(String restaurantId);
 
     public List<BookingDTO> findByBookingDate (LocalDate date);
+
+    public List<BookingDTO> getAllBookings();
+
 }

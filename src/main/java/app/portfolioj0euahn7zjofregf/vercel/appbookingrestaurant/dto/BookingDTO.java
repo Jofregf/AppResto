@@ -13,14 +13,18 @@ public class BookingDTO {
 
     private int bookingPartySize;
 
+    private boolean isActive;
+
     public BookingDTO() {
     }
 
-    public BookingDTO(String bookingId, LocalDate bookingDate, LocalTime bookingTime, int bookingPartySize) {
+    public BookingDTO(String bookingId, LocalDate bookingDate, LocalTime bookingTime,
+                      int bookingPartySize, boolean isActive) {
         this.bookingId = bookingId;
         this.bookingDate = bookingDate;
         this.bookingTime = bookingTime;
         this.bookingPartySize = bookingPartySize;
+        this.isActive = isActive;
     }
 
     public String getBookingId() {
@@ -55,5 +59,11 @@ public class BookingDTO {
         this.bookingPartySize = bookingPartySize;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
 
+    public void setActive(boolean active) {
+        isActive = active;
+    }
 }

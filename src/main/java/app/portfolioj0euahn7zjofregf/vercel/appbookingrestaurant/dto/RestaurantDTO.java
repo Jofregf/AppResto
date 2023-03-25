@@ -1,7 +1,10 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -13,14 +16,35 @@ public class RestaurantDTO {
     @NotEmpty
     @Size(min = 3, message = "The restaurant's name must have at least 2 characters")
     private String restaurantName;
+
+    @NotEmpty
     private String restaurantAddress;
+
+    @NotEmpty
     private String restaurantPhone;
+
+    @NotEmpty
+    @Size(min = 10, message = "The restaurant's description must have at least 10 characters")
     private String restaurantDescription;
+
+    @NotNull
+    @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime openingHoursRestaurant;
+
+    @NotNull
+    @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime closingHoursRestaurant;
+
+    @NotEmpty(message = "You must add at least one photo link")
     private String[] restaurantImages;
+
+    @NotNull(message = "You must indicate the capacity of the restaurant")
+    @Min(3)
     private int restaurantCapacity;
+
+    @NotNull
     private boolean enabled;
+
     private Double averageRating;
 
     public RestaurantDTO() {

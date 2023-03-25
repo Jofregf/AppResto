@@ -33,15 +33,19 @@ public class BookingModel {
     @Column(name = "party_size", nullable = false)
     private int bookingPartySize;
 
+    @Column(name = "booking_active",  columnDefinition = "BOOLEAN DEFAULT true")
+    private boolean isActive;
+
     public BookingModel() {
     }
 
     public BookingModel(RestaurantModel restaurant, LocalDate bookingDate,
-                        LocalTime bookingTime, int bookingPartySize) {
+                        LocalTime bookingTime, int bookingPartySize, boolean isActive) {
         this.restaurant = restaurant;
         this.bookingDate = bookingDate;
         this.bookingTime = bookingTime;
         this.bookingPartySize = bookingPartySize;
+        this.isActive = isActive;
     }
 
     public String getBookingId() {
@@ -90,5 +94,13 @@ public class BookingModel {
 
     public void setBookingTime(LocalTime bookingTime) {
         this.bookingTime = bookingTime;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

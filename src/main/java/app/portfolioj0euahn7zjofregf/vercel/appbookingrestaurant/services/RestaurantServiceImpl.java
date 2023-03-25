@@ -62,7 +62,7 @@ public class RestaurantServiceImpl implements RestaurantService{
         restaurant.setClosingHoursRestaurant(restaurantDTO.getClosingHoursRestaurant());
         restaurant.setRestaurantImages(restaurantDTO.getRestaurantImages());
         restaurant.setRestaurantCapacity(restaurantDTO.getRestaurantCapacity());
-        restaurant.setEnabled(true);
+        restaurant.setEnabled(restaurantDTO.isEnabled());
         restaurant.setAverageRanting(0.0);
 
         return restaurant;

@@ -23,6 +23,7 @@ public class BookingController {
                                                 @RequestBody BookingDTO bookingDTO){
 
         boolean bookingCreated = bookingService.createBooking(bookingDTO, restaurantId, userId);
+        System.out.println(bookingCreated);
         return ResponseEntity.ok("Booking created successfully");
     }
 
@@ -58,5 +59,10 @@ public class BookingController {
     @GetMapping("/booking/date/{date}")
     public List<BookingDTO> listBookingByDate(@PathVariable LocalDate date){
         return bookingService.findByBookingDate(date);
+    }
+
+    @GetMapping("/booking")
+    public List<BookingDTO> listBookings(){
+        return bookingService.getAllBookings();
     }
 }

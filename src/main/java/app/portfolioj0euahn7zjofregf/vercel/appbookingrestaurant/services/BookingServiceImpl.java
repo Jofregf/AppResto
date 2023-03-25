@@ -12,6 +12,7 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.Re
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -40,6 +41,7 @@ public class BookingServiceImpl implements BookingService{
         bookingDTO.setBookingDate(bookingModel.getBookingDate());
         bookingDTO.setBookingTime(bookingModel.getBookingTime());
         bookingDTO.setBookingPartySize(bookingModel.getBookingPartySize());
+        bookingDTO.setActive(bookingModel.isActive());
 
         return bookingDTO;
     }
@@ -51,6 +53,7 @@ public class BookingServiceImpl implements BookingService{
         booking.setBookingDate(bookingDTO.getBookingDate());
         booking.setBookingTime(bookingDTO.getBookingTime());
         booking.setBookingPartySize(bookingDTO.getBookingPartySize());
+        booking.setActive(bookingDTO.isActive());
 
         return booking;
     }
@@ -78,6 +81,10 @@ public class BookingServiceImpl implements BookingService{
             closingDateTime = LocalDateTime.of(booking.getBookingDate(), closingTime);
         } else {
             closingDateTime = LocalDateTime.of(booking.getBookingDate().plusDays(1), closingTime);
+        }
+
+        if(booking.getBookingDate().isBefore(LocalDate.now())){
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "You are trying to reserve a date prior to the current one.");
         }
 
         if(!restaurant.getEnabled()){
@@ -173,8 +180,14 @@ public class BookingServiceImpl implements BookingService{
         }
 
         booking.setBookingDate(bookingDTO.getBookingDate());
+        LocalDate currentDate = LocalDate.now();
+
+        if(bookingDTO.getBookingDate().isBefore(currentDate)){
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "You are trying to reserve a date prior to the current one.");
+        }
         booking.setBookingTime(bookingDTO.getBookingTime());
         booking.setBookingPartySize(bookingDTO.getBookingPartySize());
+        booking.setActive(true);
 
         BookingModel bookingUpdated = bookingRepository.save(booking);
 
@@ -221,5 +234,26 @@ public class BookingServiceImpl implements BookingService{
         }
 
         return listBookings;
+    }
+
+    @Override
+    public List<BookingDTO> getAllBookings() {
+
+        List<BookingModel> bookings = bookingRepository.findAll();
+
+        List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
+
+        return listBookings;
+    }
+    @Scheduled(fixedDelay = 86400000)
+    public void updateBookingStatus(){
+        LocalDate currentDate = LocalDate.now();
+        List<BookingModel> bookings = bookingRepository.findAll();
+        for (BookingModel booking: bookings) {
+            if(booking.getBookingDate().isBefore(currentDate)){
+                booking.setActive(false);
+                bookingRepository.save(booking);
+            }
+        }
     }
 }

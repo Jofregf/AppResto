@@ -21,7 +21,7 @@ public class RestaurantController {
     private RestaurantService restaurantService;
 
     @PostMapping("/user/{userId}/restaurant")
-    public ResponseEntity<RestaurantDTO> saveRestaurant(@Valid @PathVariable(value = "userId")String userId,
+    public ResponseEntity<RestaurantDTO> saveRestaurant(@PathVariable(value = "userId")String userId,
                                                         @Valid @RequestBody RestaurantDTO restaurantDTO){
 
         return new ResponseEntity<>(restaurantService.createRestaurant(userId, restaurantDTO), HttpStatus.CREATED);
@@ -44,7 +44,7 @@ public class RestaurantController {
     @PutMapping("/restaurant/{userId}/{restaurantId}")
     public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable String userId,
                                                           @PathVariable String restaurantId,
-                                                          @RequestBody RestaurantDTO restaurantDTO){
+                                                          @Valid @RequestBody RestaurantDTO restaurantDTO){
 
         RestaurantDTO restaurantResponse = restaurantService.updateRestaurant(userId, restaurantId, restaurantDTO);
 

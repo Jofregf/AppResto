@@ -18,13 +18,11 @@ public class BookingController {
     private BookingService bookingService;
 
     @PostMapping("/user/{userId}/restaurant/{restaurantId}/booking")
-    public ResponseEntity<String> createBooking(@PathVariable String userId,
+    public ResponseEntity<BookingDTO> createBooking(@PathVariable String userId,
                                                 @PathVariable String restaurantId,
                                                 @RequestBody BookingDTO bookingDTO){
 
-        boolean bookingCreated = bookingService.createBooking(bookingDTO, restaurantId, userId);
-        System.out.println(bookingCreated);
-        return ResponseEntity.ok("Booking created successfully");
+        return new ResponseEntity<>(bookingService.createBooking(bookingDTO, restaurantId, userId), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/user/{userId}/restaurant/{restaurantId}/booking/{bookingId}")

@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class BookingServiceImpl implements BookingService{
+public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private BookingRepository bookingRepository;
@@ -34,7 +34,7 @@ public class BookingServiceImpl implements BookingService{
     @Autowired
     private UserRepository userRepository;
 
-    private BookingDTO mapDTO(BookingModel bookingModel){
+    private BookingDTO mapDTO(BookingModel bookingModel) {
 
         BookingDTO bookingDTO = new BookingDTO();
         bookingDTO.setBookingId(bookingModel.getBookingId());
@@ -46,7 +46,7 @@ public class BookingServiceImpl implements BookingService{
         return bookingDTO;
     }
 
-    private BookingModel mapEntity(BookingDTO bookingDTO){
+    private BookingModel mapEntity(BookingDTO bookingDTO) {
 
         BookingModel booking = new BookingModel();
         booking.setBookingId(bookingDTO.getBookingId());
@@ -59,7 +59,7 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
-    public boolean createBooking(BookingDTO bookingDTO, String restaurantId, String userId) {
+    public BookingDTO createBooking(BookingDTO bookingDTO, String restaurantId, String userId) {
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
@@ -73,26 +73,31 @@ public class BookingServiceImpl implements BookingService{
 
         LocalDateTime bookingDateTime = LocalDateTime.of(booking.getBookingDate(), booking.getBookingTime());
 
+        LocalTime openingTime = restaurant.getOpeningHoursRestaurant();
         LocalTime closingTime = restaurant.getClosingHoursRestaurant();
 
         LocalDateTime closingDateTime;
-
-        if(closingTime.isBefore(LocalTime.of(0,0))){
-            closingDateTime = LocalDateTime.of(booking.getBookingDate(), closingTime);
-        } else {
+        if (closingTime.isBefore(openingTime)) {
             closingDateTime = LocalDateTime.of(booking.getBookingDate().plusDays(1), closingTime);
+        } else {
+            closingDateTime = LocalDateTime.of(booking.getBookingDate(), closingTime);
         }
 
-        if(booking.getBookingDate().isBefore(LocalDate.now())){
+        LocalDateTime now = LocalDateTime.now();
+        if (bookingDateTime.isBefore(now)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The reservation time is in the past.");
+        } else if (!bookingDateTime.toLocalTime().isAfter(openingTime) && !bookingDateTime.toLocalTime().isBefore(closingTime.minusHours(1))) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The restaurant is not open at the reservation time.");
+        } else if (bookingDateTime.plusHours(1).isAfter(closingDateTime)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The restaurant does not accept reservations for that time.");
+        }
+
+        if (booking.getBookingDate().isBefore(LocalDate.now())) {
             throw new RestoAppException(HttpStatus.BAD_REQUEST, "You are trying to reserve a date prior to the current one.");
         }
 
-        if(!restaurant.getEnabled()){
-            return false;
-        }
-
-        if (bookingDateTime.plusHours(1).isAfter(closingDateTime)) {
-            return false;
+        if (!restaurant.getEnabled()) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The restaurant is not available.");
         }
 
         Set<BookingModel> existingBooking = restaurant.getBookings().stream()
@@ -101,20 +106,21 @@ public class BookingServiceImpl implements BookingService{
                 .collect(Collectors.toSet());
 
         int totalCapacity = 0;
-        for(BookingModel bookingCap:existingBooking){
+        for (BookingModel bookingCap : existingBooking) {
             totalCapacity += bookingCap.getBookingPartySize();
         }
 
-        if(totalCapacity + booking.getBookingPartySize() > restaurant.getRestaurantCapacity()){
+        if (totalCapacity + booking.getBookingPartySize() > restaurant.getRestaurantCapacity()) {
             throw new CapacityExceededException("There is not enough capacity in the restaurant to make the reservation");
 
         }
 
         booking.setRestaurant(restaurant);
         booking.setUser(user);
+        booking.setActive(true);
         BookingModel newBooking = bookingRepository.save(booking);
 
-        return true;
+        return mapDTO(newBooking);
     }
 
     @Override
@@ -132,7 +138,7 @@ public class BookingServiceImpl implements BookingService{
                 .findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking", "Id", bookingId));
 
-        if(!userId.equals(booking.getUser().getUserId()) || !restaurantId.equals(booking.getRestaurant().getRestaurantId())){
+        if (!userId.equals(booking.getUser().getUserId()) || !restaurantId.equals(booking.getRestaurant().getRestaurantId())) {
             throw new RestoAppException(HttpStatus.BAD_REQUEST, "The user or restaurant does not correspond to the booking");
         }
 
@@ -154,7 +160,7 @@ public class BookingServiceImpl implements BookingService{
                 .findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking", "Id", bookingId));
 
-        if(!userId.equals(booking.getUser().getUserId()) || !restaurantId.equals(booking.getRestaurant().getRestaurantId())){
+        if (!userId.equals(booking.getUser().getUserId()) || !restaurantId.equals(booking.getRestaurant().getRestaurantId())) {
             throw new RestoAppException(HttpStatus.BAD_REQUEST, "The user or restaurant does not correspond to the booking");
         }
 
@@ -175,14 +181,14 @@ public class BookingServiceImpl implements BookingService{
 
         int availableCapacity = totalCapacity - usedCapacity;
 
-        if(bookingDTO.getBookingPartySize() > availableCapacity){
+        if (bookingDTO.getBookingPartySize() > availableCapacity) {
             throw new CapacityExceededException("There is not enough capacity in the restaurant to make the reservation");
         }
 
         booking.setBookingDate(bookingDTO.getBookingDate());
         LocalDate currentDate = LocalDate.now();
 
-        if(bookingDTO.getBookingDate().isBefore(currentDate)){
+        if (bookingDTO.getBookingDate().isBefore(currentDate)) {
             throw new RestoAppException(HttpStatus.BAD_REQUEST, "You are trying to reserve a date prior to the current one.");
         }
         booking.setBookingTime(bookingDTO.getBookingTime());
@@ -201,7 +207,7 @@ public class BookingServiceImpl implements BookingService{
 
         List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
 
-        if(listBookings.isEmpty()){
+        if (listBookings.isEmpty()) {
             throw new ResourceNotFoundException("Bookings", "User Id", userId);
         }
 
@@ -215,7 +221,7 @@ public class BookingServiceImpl implements BookingService{
 
         List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
 
-        if(listBookings.isEmpty()){
+        if (listBookings.isEmpty()) {
             throw new ResourceNotFoundException("Bookings", "Restaurant Id", restaurantId);
         }
 
@@ -229,7 +235,7 @@ public class BookingServiceImpl implements BookingService{
 
         List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
 
-        if(listBookings.isEmpty()){
+        if (listBookings.isEmpty()) {
             throw new ResourceNotFoundException("Bookings", "Date", date);
         }
 
@@ -245,12 +251,13 @@ public class BookingServiceImpl implements BookingService{
 
         return listBookings;
     }
+
     @Scheduled(fixedDelay = 86400000)
-    public void updateBookingStatus(){
+    public void updateBookingStatus() {
         LocalDate currentDate = LocalDate.now();
         List<BookingModel> bookings = bookingRepository.findAll();
-        for (BookingModel booking: bookings) {
-            if(booking.getBookingDate().isBefore(currentDate)){
+        for (BookingModel booking : bookings) {
+            if (booking.getBookingDate().isBefore(currentDate)) {
                 booking.setActive(false);
                 bookingRepository.save(booking);
             }

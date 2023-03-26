@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface BookingService {
 
-    public boolean createBooking(BookingDTO booking, String restaurantId, String userId);
+    public BookingDTO createBooking(BookingDTO booking, String restaurantId, String userId);
 
     public void deleteBooking(String bookingId, String userId, String restaurantId);
 

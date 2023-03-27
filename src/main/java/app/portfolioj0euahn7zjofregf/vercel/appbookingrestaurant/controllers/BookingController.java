@@ -2,6 +2,7 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.BookingDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.BookingService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class BookingController {
     @PostMapping("/user/{userId}/restaurant/{restaurantId}/booking")
     public ResponseEntity<BookingDTO> createBooking(@PathVariable String userId,
                                                 @PathVariable String restaurantId,
-                                                @RequestBody BookingDTO bookingDTO){
+                                                @Valid @RequestBody BookingDTO bookingDTO){
 
         return new ResponseEntity<>(bookingService.createBooking(bookingDTO, restaurantId, userId), HttpStatus.CREATED);
     }
@@ -38,7 +39,7 @@ public class BookingController {
     public ResponseEntity<BookingDTO> updateBooking(@PathVariable String userId,
                                                     @PathVariable String restaurantId,
                                                     @PathVariable String bookingId,
-                                                    @RequestBody BookingDTO bookingDTO){
+                                                    @Valid @RequestBody BookingDTO bookingDTO){
 
         BookingDTO bookingResponse = bookingService.updateBooking(bookingDTO, userId, restaurantId, bookingId);
         return new ResponseEntity<>(bookingResponse, HttpStatus.OK);

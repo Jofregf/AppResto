@@ -1,21 +1,42 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class UserDTO {
 
     private String userId;
+    @NotEmpty
+    @Size(min = 3, message = "The username must have at least 3 characters")
     private String userName;
+
+    @NotEmpty(message = "The first name cannot be empty.")
     private String firstName;
+
+    @NotEmpty(message = "The last name cannot be empty.")
     private String lastName;
+
+    @NotEmpty(message = "The number phone cannot be empty.")
     private String userPhone;
+
+    @NotEmpty(message = "The email cannot be empty.")
+    @Email
     private String userEmail;
+
+    @NotEmpty(message = "The password cannot be empty.")
+    @Size(min = 6, message = "The password must have at least 6 characters")
     private String userPassword;
-    private Boolean enabled;
+
+    @NotNull
+    private boolean enabled;
 
     public UserDTO() {
     }
 
     public UserDTO(String userId, String userName, String firstName, String lastName, String userPhone,
-                   String userEmail, String userPassword, Boolean enabled) {
+                   String userEmail, String userPassword, boolean enabled) {
         this.userId = userId;
         this.userName = userName;
         this.firstName = firstName;
@@ -82,7 +103,7 @@ public class UserDTO {
         this.userPassword = userPassword;
     }
 
-    public Boolean getEnabled() {
+    public Boolean isEnabled() {
         return enabled;
     }
 

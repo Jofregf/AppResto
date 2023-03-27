@@ -2,6 +2,7 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.ReviewDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.ReviewService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class ReviewController {
     @PostMapping("/user/{userId}/restaurant/{restaurantId}/review")
     public ResponseEntity<ReviewDTO> saveReview(@PathVariable(value = "userId")String userId,
                                                 @PathVariable(value = "restaurantId")String restaurantId,
-                                                @RequestBody ReviewDTO reviewDTO){
+                                                @Valid @RequestBody ReviewDTO reviewDTO){
 
         return new ResponseEntity<>(reviewService.createReview(userId, restaurantId, reviewDTO), HttpStatus.CREATED);
     }
@@ -27,7 +28,7 @@ public class ReviewController {
     @PutMapping("/review/{userId}/{reviewId}")
     public ResponseEntity<ReviewDTO> updateReview(@PathVariable String reviewId,
                                                   @PathVariable String userId,
-                                                  @RequestBody ReviewDTO reviewDTO){
+                                                  @Valid @RequestBody ReviewDTO reviewDTO){
 
         ReviewDTO reviewResponse = reviewService.updateReview(reviewId, reviewDTO, userId);
         return new ResponseEntity<>(reviewResponse, HttpStatus.OK);

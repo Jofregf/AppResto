@@ -1,11 +1,18 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
+import jakarta.validation.constraints.*;
+
 public class ReviewDTO {
 
     private String reviewId;
 
+    @NotNull()
+    @Min(1)
+    @Max(5)
     private int ratingReview;
 
+    @NotEmpty
+    @Size(min = 10, message = "You must enter a comment of at least 10 characters")
     private String commentReview;
 
     public ReviewDTO() {

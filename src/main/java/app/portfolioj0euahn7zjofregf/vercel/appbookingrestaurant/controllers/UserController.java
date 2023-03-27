@@ -3,6 +3,7 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserResponse;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +28,12 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<UserDTO> saveUser(@RequestBody UserDTO userDTO){
+    public ResponseEntity<UserDTO> saveUser(@Valid @RequestBody UserDTO userDTO){
         return new ResponseEntity<>(userService.createUser(userDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/user/{userId}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable String userId, @RequestBody UserDTO userDTO){
+    public ResponseEntity<UserDTO> updateUser(@PathVariable String userId, @Valid @RequestBody UserDTO userDTO){
         UserDTO userResponse = userService.updateUser(userDTO, userId);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }

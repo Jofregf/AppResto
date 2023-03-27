@@ -2,6 +2,7 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.MenuDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.MenuService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public class MenuController {
     private MenuService menuService;
 
     @PostMapping("/restaurant/{restaurantId}/menu")
-    public ResponseEntity<MenuDTO> saveMenu(@PathVariable String restaurantId, @RequestBody MenuDTO menuDTO) {
+    public ResponseEntity<MenuDTO> saveMenu(@PathVariable String restaurantId, @Valid @RequestBody MenuDTO menuDTO) {
 
         return new ResponseEntity<>(menuService.createMenu(menuDTO, restaurantId), HttpStatus.CREATED);
     }
@@ -25,7 +26,7 @@ public class MenuController {
     @PutMapping("/restaurant/{restaurantId}/menu/{menuId}")
     public ResponseEntity<MenuDTO> updateMenu(@PathVariable String restaurantId,
                                               @PathVariable String menuId,
-                                              @RequestBody MenuDTO menuDTO){
+                                              @Valid @RequestBody MenuDTO menuDTO){
 
         MenuDTO menuResponse = menuService.updateMenu(restaurantId, menuDTO, menuId);
 

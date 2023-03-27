@@ -34,7 +34,7 @@ public class UserModel {
     @Column(name = "user_password", nullable = false, columnDefinition = "VARCHAR(50)")
     private String userPassword;
 
-    @Column(name = "user_enabled", nullable = false)
+    @Column(name = "user_enabled", columnDefinition = "BOOLEAN DEFAULT true")
     private Boolean enabled;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -126,26 +126,4 @@ public class UserModel {
         this.enabled = enabled;
     }
 
-//    public Set<RoleModel> getRoles() {
-//        return roles;
-//    }
-//
-//    public void setRoles(Set<RoleModel> roles) {
-//        this.roles = roles;
-//    }
-
-
-    @Override
-    public String toString() {
-        return "UserModel{" +
-                "userId='" + userId + '\'' +
-                ", userName='" + userName + '\'' +
-                ", name='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", userPhone='" + userPhone + '\'' +
-                ", userEmail='" + userEmail + '\'' +
-                ", userPassword='" + userPassword + '\'' +
-                ", enabled=" + enabled +
-                '}';
-    }
 }

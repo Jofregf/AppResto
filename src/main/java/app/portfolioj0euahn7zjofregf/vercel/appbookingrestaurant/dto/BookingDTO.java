@@ -1,5 +1,9 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -7,10 +11,16 @@ public class BookingDTO {
 
     private String bookingId;
 
+    @NotNull(message = "You must enter the booking day")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate bookingDate;
 
+    @NotNull(message = "You must enter the booking time")
+    @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime bookingTime;
 
+    @NotNull(message = "You must indicate the number of people")
+    @Min(1)
     private int bookingPartySize;
 
     private boolean isActive;

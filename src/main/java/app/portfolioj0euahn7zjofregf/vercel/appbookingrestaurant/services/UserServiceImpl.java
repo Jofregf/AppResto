@@ -4,13 +4,11 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserResponse;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.ResourceNotFoundException;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.RestoAppException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,7 +57,6 @@ public class UserServiceImpl implements UserService {
         UserModel user = mapEntity(userDTO);
 
         UserModel newUser = userRepository.save(user);
-
         UserDTO userResponse = mapDTO(newUser);
 
         return userResponse;
@@ -132,7 +129,8 @@ public class UserServiceImpl implements UserService {
         UserModel user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-        user.setEnabled(userDTO.getEnabled());
+
+        user.setEnabled(userDTO.isEnabled());
 
         UserModel userUpdated = userRepository.save(user);
 

@@ -14,24 +14,24 @@ public class RestaurantDTO {
     private String restaurantId;
 
     @NotEmpty
-    @Size(min = 3, message = "The restaurant's name must have at least 2 characters")
+    @Size(min = 3, message = "The restaurant's name must have at least 3 characters")
     private String restaurantName;
 
-    @NotEmpty
+    @NotEmpty(message = "You must enter the address of the restaurant")
     private String restaurantAddress;
 
-    @NotEmpty
+    @NotEmpty(message = "You must enter the number phone of the restaurant")
     private String restaurantPhone;
 
     @NotEmpty
     @Size(min = 10, message = "The restaurant's description must have at least 10 characters")
     private String restaurantDescription;
 
-    @NotNull
+    @NotNull(message = "You must enter the opening hours of the restaurant")
     @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime openingHoursRestaurant;
 
-    @NotNull
+    @NotNull(message = "You must enter the closing time of the restaurant")
     @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime closingHoursRestaurant;
 

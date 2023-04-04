@@ -1,16 +1,13 @@
-package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.Security;
+package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.RestoAppException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Component

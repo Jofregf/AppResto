@@ -1,6 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services;
 
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.Security.JwtTokenProvider;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtTokenProvider;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.AdminUserDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserResponse;

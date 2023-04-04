@@ -1,4 +1,4 @@
-package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.Security;
+package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
 import org.springframework.security.core.GrantedAuthority;
@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -79,9 +78,6 @@ public class CustomUserDetails implements UserDetails {
             GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(roleName);
             authorities.add(grantedAuthority);
         }
-        //        List<GrantedAuthority> authorities = userModel.getRole() == null ?
-//                Collections.emptyList() :
-//                Collections.singletonList(new SimpleGrantedAuthority(userModel.getRole().getRoleName()));
 
         return new CustomUserDetails(
                 userModel.getUserId(),

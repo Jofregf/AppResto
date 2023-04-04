@@ -1,4 +1,4 @@
-package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.Security;
+package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;

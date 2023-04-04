@@ -1,4 +1,4 @@
-package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.Security;
+package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

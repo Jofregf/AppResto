@@ -1,8 +1,8 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.config;
 
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.Security.CustomUserDetailsService;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.Security.JwtAuthenticationEntryPoint;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.Security.JwtAuthenticationFilter;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.CustomUserDetailsService;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtAuthenticationEntryPoint;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

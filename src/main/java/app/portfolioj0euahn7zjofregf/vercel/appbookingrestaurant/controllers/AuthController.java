@@ -1,7 +1,7 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.Security.JwtAuthResponseDTO;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.Security.JwtTokenProvider;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtAuthResponseDTO;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtTokenProvider;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.LoginDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RegisterDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RoleModel;
@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/auth")

@@ -9,12 +9,14 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.Rest
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.RestaurantRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.ReviewRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,6 +35,9 @@ public class RestaurantServiceImpl implements RestaurantService{
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
     private RestaurantDTO mapDTO(RestaurantModel restaurantModel) {
 
         RestaurantDTO restaurantDTO = new RestaurantDTO();
@@ -40,6 +45,7 @@ public class RestaurantServiceImpl implements RestaurantService{
         restaurantDTO.setRestaurantName(restaurantModel.getRestaurantName());
         restaurantDTO.setRestaurantAddress(restaurantModel.getRestaurantAddress());
         restaurantDTO.setRestaurantPhone(restaurantModel.getRestaurantPhone());
+        restaurantDTO.setRestaurantEmail(restaurantModel.getRestaurantEmail());
         restaurantDTO.setRestaurantDescription(restaurantModel.getRestaurantDescription());
         restaurantDTO.setOpeningHoursRestaurant(restaurantModel.getOpeningHoursRestaurant());
         restaurantDTO.setClosingHoursRestaurant(restaurantModel.getClosingHoursRestaurant());
@@ -57,31 +63,16 @@ public class RestaurantServiceImpl implements RestaurantService{
         restaurant.setRestaurantName(restaurantDTO.getRestaurantName());
         restaurant.setRestaurantAddress(restaurantDTO.getRestaurantAddress());
         restaurant.setRestaurantPhone(restaurantDTO.getRestaurantPhone());
+        restaurant.setRestaurantEmail(restaurantDTO.getRestaurantEmail());
         restaurant.setRestaurantDescription(restaurantDTO.getRestaurantDescription());
         restaurant.setOpeningHoursRestaurant(restaurantDTO.getOpeningHoursRestaurant());
         restaurant.setClosingHoursRestaurant(restaurantDTO.getClosingHoursRestaurant());
         restaurant.setRestaurantImages(restaurantDTO.getRestaurantImages());
         restaurant.setRestaurantCapacity(restaurantDTO.getRestaurantCapacity());
-        restaurant.setEnabled(restaurantDTO.isEnabled());
+        restaurant.setEnabled(true);
         restaurant.setAverageRanting(0.0);
 
         return restaurant;
-    }
-
-    @Override
-    public RestaurantDTO createRestaurant(String userId, RestaurantDTO restaurantDTO) {
-
-        RestaurantModel restaurant = mapEntity(restaurantDTO);
-
-        UserModel user = userRepository
-                .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-
-        restaurant.setUser(user);
-
-        RestaurantModel newRestaurant = restaurantRepository.save(restaurant);
-
-        return mapDTO(newRestaurant);
     }
 
     @Override
@@ -124,7 +115,34 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public RestaurantDTO updateRestaurant(String userId, String restaurantId, RestaurantDTO restaurantDTO) {
+    public RestaurantDTO createRestaurant(String userId, RestaurantDTO restaurantDTO, String token ) {
+
+        RestaurantModel restaurant = mapEntity(restaurantDTO);
+
+        UserModel user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+        String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
+        if(roleToken == null || !roleToken.equals("ROLE_RESTO")){
+            throw new AccessDeniedException("access denied, role not allowed");
+        }
+
+        String idToken = jwtTokenProvider.getUserIdFromToken(token);
+        if (idToken == null || !idToken.equals(user.getUserId())){
+            throw new AccessDeniedException("Access denied, id does not match");
+        }
+
+        restaurant.setUser(user);
+
+        RestaurantModel newRestaurant = restaurantRepository.save(restaurant);
+
+        return mapDTO(newRestaurant);
+    }
+
+    @Override
+    public RestaurantDTO updateRestaurant(String userId, String restaurantId, RestaurantDTO restaurantDTO,
+                                          String token) {
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
@@ -134,6 +152,16 @@ public class RestaurantServiceImpl implements RestaurantService{
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
+        String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
+        if(roleToken == null || !roleToken.equals("ROLE_RESTO")){
+            throw new AccessDeniedException("access denied, role not allowed");
+        }
+
+        String idToken = jwtTokenProvider.getUserIdFromToken(token);
+        if(idToken == null || !idToken.equals(user.getUserId())){
+            throw new AccessDeniedException("Access denied, id does not match");
+        }
+
         if(!userId.equals(restaurant.getUser().getUserId())){
             throw new RestoAppException(HttpStatus.BAD_REQUEST, "The user is not the owner of the restaurant");
         }
@@ -141,6 +169,7 @@ public class RestaurantServiceImpl implements RestaurantService{
         restaurant.setRestaurantName(restaurantDTO.getRestaurantName());
         restaurant.setRestaurantAddress(restaurantDTO.getRestaurantAddress());
         restaurant.setRestaurantPhone(restaurantDTO.getRestaurantPhone());
+        restaurant.setRestaurantEmail(restaurantDTO.getRestaurantEmail());
         restaurant.setRestaurantDescription(restaurantDTO.getRestaurantDescription());
         restaurant.setOpeningHoursRestaurant(restaurantDTO.getOpeningHoursRestaurant());
         restaurant.setClosingHoursRestaurant(restaurantDTO.getClosingHoursRestaurant());
@@ -152,7 +181,7 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public void deleteRestaurant(String userId, String restaurantId) {
+    public void deleteRestaurant(String userId, String restaurantId, String token) {
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
@@ -162,6 +191,16 @@ public class RestaurantServiceImpl implements RestaurantService{
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
+        String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
+        if(roleToken == null || !roleToken.equals("ROLE_RESTO")){
+            throw new AccessDeniedException("access denied, role not allowed");
+        }
+
+        String idToken = jwtTokenProvider.getUserIdFromToken(token);
+        if(idToken == null || !idToken.equals(user.getUserId())){
+            throw new AccessDeniedException("Access denied, id does not match");
+        }
+
         if(!userId.equals(restaurant.getUser().getUserId())){
             throw new RestoAppException(HttpStatus.BAD_REQUEST, "The user is not the owner of the restaurant");
         }
@@ -169,11 +208,17 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public RestaurantDTO updateEnabled(RestaurantDTO restaurantDTO, String restaurantId) {
+    public RestaurantDTO updateEnabled(RestaurantDTO restaurantDTO, String restaurantId, String token) {
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
+
+        String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
+        if(roleToken == null || !roleToken.equals("ROLE_ADMIN")){
+            throw new AccessDeniedException("Access denied");
+        }
+
         restaurant.setEnabled(restaurantDTO.isEnabled());
 
         RestaurantModel updateRestaurant = restaurantRepository.save(restaurant);

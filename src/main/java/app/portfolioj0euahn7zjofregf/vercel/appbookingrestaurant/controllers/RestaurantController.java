@@ -21,14 +21,6 @@ public class RestaurantController {
     @Autowired
     private RestaurantService restaurantService;
 
-    @PreAuthorize("hasRole('RESTO')")
-    @PostMapping("/user/{userId}/restaurant")
-    public ResponseEntity<RestaurantDTO> saveRestaurant(@PathVariable(value = "userId")String userId,
-                                                        @Valid @RequestBody RestaurantDTO restaurantDTO){
-
-        return new ResponseEntity<>(restaurantService.createRestaurant(userId, restaurantDTO), HttpStatus.CREATED);
-    }
-
     @GetMapping("/restaurants")
     public RestaurantResponse restaurantsList(@RequestParam(value = "pageNumber", defaultValue = AppConstants.DEFAULT_NUMBER_PAGE, required = false)int pageNumber,
                                               @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
@@ -38,26 +30,56 @@ public class RestaurantController {
         return restaurantService.getRestaurants(pageNumber, pageSize, sortBy, sortDir);
     }
 
-    @GetMapping("/restaurant/{restaurantId}")
+    @GetMapping("/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantDTO> getRestaurantById(@PathVariable String restaurantId){
+
         return ResponseEntity.ok(restaurantService.getRestaurantById(restaurantId));
     }
 
-    @PreAuthorize("hasRole('RESTO')")
-    @PutMapping("/restaurant/{userId}/{restaurantId}")
-    public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable String userId,
-                                                          @PathVariable String restaurantId,
-                                                          @Valid @RequestBody RestaurantDTO restaurantDTO){
+    @GetMapping("/restaurants/menu/{menuName}")
+    public List<RestaurantDTO> listRestaurantsByMenu(@PathVariable String menuName){
 
-        RestaurantDTO restaurantResponse = restaurantService.updateRestaurant(userId, restaurantId, restaurantDTO);
+        return restaurantService.findRestaurantsByMenuName(menuName);
+    }
+
+    @GetMapping("/booking/{bookingId}/restaurant")
+    public RestaurantDTO findRestaurantByBooking(@PathVariable String bookingId){
+
+        return restaurantService.findRestaurantByBookingId(bookingId);
+    }
+
+    @PreAuthorize("hasRole('ROLE_RESTO')")
+    @PostMapping("/restaurants")
+    public ResponseEntity<RestaurantDTO> saveRestaurant(@RequestHeader(value = "userId")String userId,
+                                                        @Valid @RequestBody RestaurantDTO restaurantDTO,
+                                                        @RequestHeader(value="Authorization") String authorizHeader){
+
+        String token = authorizHeader.replace("Bearer ", "");
+        return new ResponseEntity<>(restaurantService.createRestaurant(userId, restaurantDTO, token), HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("hasRole('ROLE_RESTO')")
+    @PutMapping("/restaurants/{restaurantId}")
+    public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable String restaurantId,
+                                                          @Valid @RequestBody RestaurantDTO restaurantDTO,
+                                                          @RequestHeader(value="userId") String userId,
+                                                          @RequestHeader(value="Authorization") String authorizHeader){
+
+        String token = authorizHeader.replace("Bearer ", "");
+
+        RestaurantDTO restaurantResponse = restaurantService.updateRestaurant(userId, restaurantId, restaurantDTO, token);
 
         return new ResponseEntity<>(restaurantResponse, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('RESTO')")
-    @DeleteMapping("/restaurant/{userId}/{restaurantId}")
-    public ResponseEntity<String> deleteRestaurant(@PathVariable String userId, @PathVariable String restaurantId){
-        restaurantService.deleteRestaurant(userId, restaurantId);
+    @PreAuthorize("hasRole('ROLE_RESTO')")
+    @DeleteMapping("/restaurants/{restaurantId}")
+    public ResponseEntity<String> deleteRestaurant(@PathVariable String restaurantId,
+                                                   @RequestHeader(value="userId") String userId,
+                                                   @RequestHeader(value="Authorization") String authorizHeader){
+
+        String token = authorizHeader.replace("Bearer ", "");
+        restaurantService.deleteRestaurant(userId, restaurantId, token);
         return new ResponseEntity<>("Restaurant deleted successfully", HttpStatus.OK);
 
     }
@@ -65,20 +87,12 @@ public class RestaurantController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/admin/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantDTO> updateEnable(@PathVariable String restaurantId,
-                                                      @RequestBody RestaurantDTO restaurantDTO){
+                                                      @RequestBody RestaurantDTO restaurantDTO,
+                                                      @RequestHeader(value="Authorization") String authorizHeader){
 
-        RestaurantDTO restaurantResponse = restaurantService.updateEnabled(restaurantDTO, restaurantId);
+        String token = authorizHeader.replace("Bearer ", "");
+        RestaurantDTO restaurantResponse = restaurantService.updateEnabled(restaurantDTO, restaurantId, token);
 
         return new ResponseEntity<>(restaurantResponse, HttpStatus.OK);
-    }
-
-    @GetMapping("/restaurants/menu/{menuName}")
-    public List<RestaurantDTO> listRestaurantsByMenu(@PathVariable String menuName){
-        return restaurantService.findRestaurantsByMenuName(menuName);
-    }
-
-    @GetMapping("/booking/{bookingId}/restaurant")
-    public RestaurantDTO findRestaurantByBooking(@PathVariable String bookingId){
-        return restaurantService.findRestaurantByBookingId(bookingId);
     }
 }

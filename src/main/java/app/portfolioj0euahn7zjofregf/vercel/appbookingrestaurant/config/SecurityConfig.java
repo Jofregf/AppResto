@@ -49,9 +49,11 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.GET, "/api/restaurants").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/restaurants", "/api/restaurants/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/user/*/restaurant").hasRole("RESTO")
+                .requestMatchers(HttpMethod.POST, "/api/restaurants/**").hasRole("RESTO")
+                .requestMatchers(HttpMethod.PUT, "/api/restaurants/**").hasRole("RESTO")
+                .requestMatchers(HttpMethod.DELETE, "/api/restaurants/**").hasRole("RESTO")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest()
                 .authenticated();
@@ -86,19 +88,4 @@ public class SecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 
-
-    // Link https://github.com/Jofregf/Spring/blob/main/Spring-Security-JWT-08/src/main/java/com/example/SpringSecurityJWT08/security/config/SecurityConfig.java
-    /*
-    USER
-
-    eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUBjb3JyZS5jb20iLCJpYXQiOjE2ODAyNzQ1MjQsImV4cCI6MTY4MDM2MDkyNH0.cX1HLm9AAuJDu-XKOvuJKOOzhK-N4WiwvsrabSB7f_kaPqRW79Q8sSllw94ICM9r_IJYEobIFHpnR8q_eDlA2A
-
-            RESTO
-
-    eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiZWxpQGNvcnJlLmNvbSIsImlhdCI6MTY4MDI3NDQ4NiwiZXhwIjoxNjgwMzYwODg2fQ.MF_gtvMrAQGZO2T5U--a74eincK6hPGh7H4PI7UkvWc6JljBWQdYuz8ZdEewENG-b6mZD6i1tDRbIEq2UCWYyQ
-
-            ADMIN
-
-    eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTY4MDM1NzcwMywiZXhwIjoxNjgwNDQ0MTAzLCJ1c2VySWQiOiI1MzFkMzQ4NC1mM2QxLTRmYzQtYTVjYS0yODgxZDRjNjdhNGQifQ.82g0NEhKtxms_dmuPTdcX7HPS7CJJJvInJKKLuogJ9uA-D-ZX7r6edazw9Ew8MsBP-hvDjFpRKdGc5Y7XXGU_Q
-*/
 }

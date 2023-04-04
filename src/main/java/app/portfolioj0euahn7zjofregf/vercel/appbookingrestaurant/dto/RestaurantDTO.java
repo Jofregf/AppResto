@@ -1,9 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
@@ -22,6 +19,10 @@ public class RestaurantDTO {
 
     @NotEmpty(message = "You must enter the number phone of the restaurant")
     private String restaurantPhone;
+
+    @NotEmpty(message = "The email cannot be empty.")
+    @Email
+    private String restaurantEmail;
 
     @NotEmpty
     @Size(min = 10, message = "The restaurant's description must have at least 10 characters")
@@ -51,13 +52,14 @@ public class RestaurantDTO {
     }
 
     public RestaurantDTO(String restaurantId, String restaurantName, String restaurantAddress,
-                         String restaurantPhone, String restaurantDescription,
+                         String restaurantPhone, String restaurantEmail, String restaurantDescription,
                          LocalTime openingHoursRestaurant, LocalTime closingHoursRestaurant,
                          String[] restaurantImages, int restaurantCapacity, boolean enabled, Double averageRating) {
         this.restaurantId = restaurantId;
         this.restaurantName = restaurantName;
         this.restaurantAddress = restaurantAddress;
         this.restaurantPhone = restaurantPhone;
+        this.restaurantEmail = restaurantEmail;
         this.restaurantDescription = restaurantDescription;
         this.openingHoursRestaurant = openingHoursRestaurant;
         this.closingHoursRestaurant = closingHoursRestaurant;
@@ -97,6 +99,14 @@ public class RestaurantDTO {
 
     public void setRestaurantPhone(String restaurantPhone) {
         this.restaurantPhone = restaurantPhone;
+    }
+
+    public String getRestaurantEmail() {
+        return restaurantEmail;
+    }
+
+    public void setRestaurantEmail(String restaurantEmail) {
+        this.restaurantEmail = restaurantEmail;
     }
 
     public String getRestaurantDescription() {

@@ -26,6 +26,9 @@ public class RestaurantModel {
     @Column(name = "phone", nullable = false, columnDefinition = "VARCHAR(50)")
     private String restaurantPhone;
 
+    @Column(name = "restaurant_email", nullable = false, unique = true, columnDefinition = "VARCHAR(50)")
+    private String restaurantEmail;
+
     @Column(name = "description", nullable = false)
     private String restaurantDescription;
 
@@ -64,13 +67,14 @@ public class RestaurantModel {
     }
 
     public RestaurantModel(String restaurantId, String restaurantName, String restaurantAddress, String restaurantPhone,
-                           String restaurantDescription, LocalTime openingHoursRestaurant,
+                           String restaurantEmail, String restaurantDescription, LocalTime openingHoursRestaurant,
                            LocalTime closingHoursRestaurant, String[] restaurantImages,
                            int restaurantCapacity, Boolean enabled, Double averageRating, UserModel user) {
         this.restaurantId = restaurantId;
         this.restaurantName = restaurantName;
         this.restaurantAddress = restaurantAddress;
         this.restaurantPhone = restaurantPhone;
+        this.restaurantEmail = restaurantEmail;
         this.restaurantDescription = restaurantDescription;
         this.openingHoursRestaurant = openingHoursRestaurant;
         this.closingHoursRestaurant = closingHoursRestaurant;
@@ -111,6 +115,14 @@ public class RestaurantModel {
 
     public void setRestaurantPhone(String restaurantPhone) {
         this.restaurantPhone = restaurantPhone;
+    }
+
+    public String getRestaurantEmail() {
+        return restaurantEmail;
+    }
+
+    public void setRestaurantEmail(String restaurantEmail) {
+        this.restaurantEmail = restaurantEmail;
     }
 
     public String getRestaurantDescription() {

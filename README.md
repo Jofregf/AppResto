@@ -5,5 +5,8 @@
 * PostgreSQL Driver
 * Spring Web
 * Spring Boot DevTools
+* Spring Security
 * Hibernate Validator
-
+* JWT
+* jackson-databind
+* jaxb-api

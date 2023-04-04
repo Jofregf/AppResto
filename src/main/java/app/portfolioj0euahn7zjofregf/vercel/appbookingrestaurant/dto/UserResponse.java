@@ -4,7 +4,7 @@ import java.util.List;
 
 public class UserResponse {
 
-    private List<UserDTO> contents;
+    private List<AdminUserDTO> contents;
 
     private int pageNumber;
 
@@ -19,11 +19,11 @@ public class UserResponse {
     public UserResponse() {
     }
 
-    public List<UserDTO> getContents() {
+    public List<AdminUserDTO> getContents() {
         return contents;
     }
 
-    public void setContents(List<UserDTO> contents) {
+    public void setContents(List<AdminUserDTO> contents) {
         this.contents = contents;
     }
 

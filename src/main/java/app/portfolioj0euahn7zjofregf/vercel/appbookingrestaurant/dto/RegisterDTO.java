@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-public class UserDTO {
+public class RegisterDTO {
 
     private String userId;
     @NotEmpty
@@ -32,19 +32,7 @@ public class UserDTO {
     @NotNull
     private boolean enabled;
 
-    public UserDTO() {
-    }
-
-    public UserDTO(String userId, String userName, String firstName, String lastName, String userPhone,
-                   String userEmail, String userPassword, boolean enabled) {
-        this.userId = userId;
-        this.userName = userName;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.userPhone = userPhone;
-        this.userEmail = userEmail;
-        this.userPassword = userPassword;
-        this.enabled = enabled;
+    public RegisterDTO() {
     }
 
     public String getUserId() {
@@ -103,14 +91,11 @@ public class UserDTO {
         this.userPassword = userPassword;
     }
 
-    public Boolean isEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnabled(Boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
-
-
 }
-

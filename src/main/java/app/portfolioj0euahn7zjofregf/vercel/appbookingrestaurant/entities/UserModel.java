@@ -31,7 +31,7 @@ public class UserModel {
     @Column(name = "user_email", nullable = false, unique = true, columnDefinition = "VARCHAR(50)")
     private String userEmail;
 
-    @Column(name = "user_password", nullable = false, columnDefinition = "VARCHAR(50)")
+    @Column(name = "user_password", nullable = false, columnDefinition = "VARCHAR(80)")
     private String userPassword;
 
     @Column(name = "user_enabled", columnDefinition = "BOOLEAN DEFAULT true")
@@ -46,11 +46,16 @@ public class UserModel {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookingModel> bookings = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+    @JoinColumn(name = "role_id", referencedColumnName = "role_id")
+    private RoleModel role;
+
     public UserModel() {
     }
 
     public UserModel(String userId, String userName, String firstName, String lastName, String userPhone,
-                     String userEmail, String userPassword, Boolean enabled) {
+                     String userEmail, String userPassword, Boolean enabled, Set<ReviewModel> reviews,
+                     Set<RestaurantModel> restaurants, Set<BookingModel> bookings, RoleModel role) {
         this.userId = userId;
         this.userName = userName;
         this.firstName = firstName;
@@ -59,7 +64,10 @@ public class UserModel {
         this.userEmail = userEmail;
         this.userPassword = userPassword;
         this.enabled = enabled;
-
+        this.reviews = reviews;
+        this.restaurants = restaurants;
+        this.bookings = bookings;
+        this.role = role;
     }
 
     public String getUserId() {
@@ -126,4 +134,35 @@ public class UserModel {
         this.enabled = enabled;
     }
 
+    public Set<ReviewModel> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Set<ReviewModel> reviews) {
+        this.reviews = reviews;
+    }
+
+    public Set<RestaurantModel> getRestaurants() {
+        return restaurants;
+    }
+
+    public void setRestaurants(Set<RestaurantModel> restaurants) {
+        this.restaurants = restaurants;
+    }
+
+    public Set<BookingModel> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(Set<BookingModel> bookings) {
+        this.bookings = bookings;
+    }
+
+    public RoleModel getRole() {
+        return role;
+    }
+
+    public void setRole(RoleModel rol) {
+        this.role = rol;
+    }
 }

@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class RestaurantController {
     @Autowired
     private RestaurantService restaurantService;
 
+    @PreAuthorize("hasRole('RESTO')")
     @PostMapping("/user/{userId}/restaurant")
     public ResponseEntity<RestaurantDTO> saveRestaurant(@PathVariable(value = "userId")String userId,
                                                         @Valid @RequestBody RestaurantDTO restaurantDTO){
@@ -41,6 +43,7 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.getRestaurantById(restaurantId));
     }
 
+    @PreAuthorize("hasRole('RESTO')")
     @PutMapping("/restaurant/{userId}/{restaurantId}")
     public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable String userId,
                                                           @PathVariable String restaurantId,
@@ -51,6 +54,7 @@ public class RestaurantController {
         return new ResponseEntity<>(restaurantResponse, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('RESTO')")
     @DeleteMapping("/restaurant/{userId}/{restaurantId}")
     public ResponseEntity<String> deleteRestaurant(@PathVariable String userId, @PathVariable String restaurantId){
         restaurantService.deleteRestaurant(userId, restaurantId);
@@ -58,7 +62,8 @@ public class RestaurantController {
 
     }
 
-    @PutMapping("/admin/restaurant/{restaurantId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/admin/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantDTO> updateEnable(@PathVariable String restaurantId,
                                                       @RequestBody RestaurantDTO restaurantDTO){
 

@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface MenuService {
 
-    public MenuDTO createMenu(MenuDTO menuDTO, String restaurantId);
+    public MenuDTO createMenu(MenuDTO menuDTO, String restaurantId, String token);
 
-    public MenuDTO updateMenu(String restaurantId, MenuDTO menuDTO, String menuId);
+    public MenuDTO updateMenu(String restaurantId, MenuDTO menuDTO, String menuId, String token);
 
     public MenuDTO getMenuById(String menuId);
 
-    public void deleteMenu(String restaurantId, String menuId);
+    public void deleteMenu(String restaurantId, String menuId, String token);
 
     public List<MenuDTO> findMenuByRestaurantId(String restaurantId);
 

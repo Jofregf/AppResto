@@ -21,7 +21,7 @@ public class RestaurantController {
     @Autowired
     private RestaurantService restaurantService;
 
-    @GetMapping("/restaurants")
+    @GetMapping("/restaurants") //TODO: YA LISTO!!!!!
     public RestaurantResponse restaurantsList(@RequestParam(value = "pageNumber", defaultValue = AppConstants.DEFAULT_NUMBER_PAGE, required = false)int pageNumber,
                                               @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
                                               @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
@@ -30,14 +30,14 @@ public class RestaurantController {
         return restaurantService.getRestaurants(pageNumber, pageSize, sortBy, sortDir);
     }
 
-    @GetMapping("/restaurants/{restaurantId}")
+    @GetMapping("/restaurants/{restaurantId}") //TODO: YA LISTO!!!!!
     public ResponseEntity<RestaurantDTO> getRestaurantById(@PathVariable String restaurantId){
 
         return ResponseEntity.ok(restaurantService.getRestaurantById(restaurantId));
     }
 
-    @GetMapping("/restaurants/menu/{menuName}")
-    public List<RestaurantDTO> listRestaurantsByMenu(@PathVariable String menuName){
+    @GetMapping("/menus/restaurants") //TODO: YA LISTO!!!!!
+    public List<RestaurantDTO> listRestaurantsByMenu(@RequestHeader(value="menuName") String menuName){
 
         return restaurantService.findRestaurantsByMenuName(menuName);
     }
@@ -49,7 +49,7 @@ public class RestaurantController {
     }
 
     @PreAuthorize("hasRole('ROLE_RESTO')")
-    @PostMapping("/restaurants")
+    @PostMapping("/restaurants") //TODO: YA LISTO!!!!!
     public ResponseEntity<RestaurantDTO> saveRestaurant(@RequestHeader(value = "userId")String userId,
                                                         @Valid @RequestBody RestaurantDTO restaurantDTO,
                                                         @RequestHeader(value="Authorization") String authorizHeader){
@@ -59,7 +59,7 @@ public class RestaurantController {
     }
 
     @PreAuthorize("hasRole('ROLE_RESTO')")
-    @PutMapping("/restaurants/{restaurantId}")
+    @PutMapping("/restaurants/{restaurantId}") //TODO: YA LISTO!!!!!
     public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable String restaurantId,
                                                           @Valid @RequestBody RestaurantDTO restaurantDTO,
                                                           @RequestHeader(value="userId") String userId,
@@ -73,7 +73,7 @@ public class RestaurantController {
     }
 
     @PreAuthorize("hasRole('ROLE_RESTO')")
-    @DeleteMapping("/restaurants/{restaurantId}")
+    @DeleteMapping("/restaurants/{restaurantId}") //TODO: YA LISTO!!!!!
     public ResponseEntity<String> deleteRestaurant(@PathVariable String restaurantId,
                                                    @RequestHeader(value="userId") String userId,
                                                    @RequestHeader(value="Authorization") String authorizHeader){
@@ -85,7 +85,7 @@ public class RestaurantController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PutMapping("/admin/restaurants/{restaurantId}")
+    @PutMapping("/admin/restaurants/{restaurantId}") //TODO: YA LISTO!!!!!
     public ResponseEntity<RestaurantDTO> updateEnable(@PathVariable String restaurantId,
                                                       @RequestBody RestaurantDTO restaurantDTO,
                                                       @RequestHeader(value="Authorization") String authorizHeader){

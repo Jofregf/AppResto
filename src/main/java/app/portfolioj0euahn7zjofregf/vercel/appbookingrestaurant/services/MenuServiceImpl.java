@@ -7,8 +7,10 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.Reso
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.RestoAppException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.MenuRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.RestaurantRepository;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,9 @@ public class MenuServiceImpl implements MenuService{
 
     @Autowired
     private RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     private MenuDTO mapDTO(MenuModel menuModel) {
 
@@ -46,12 +51,23 @@ public class MenuServiceImpl implements MenuService{
     }
 
     @Override
-    public MenuDTO createMenu(MenuDTO menuDTO, String restaurantId) {
+    public MenuDTO createMenu(MenuDTO menuDTO, String restaurantId, String token) {
 
         MenuModel menu = mapEntity(menuDTO);
+
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
+
+        String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
+        if(roleToken == null || !roleToken.equals("ROLE_RESTO")){
+            throw new AccessDeniedException("access denied, role not allowed");
+        }
+
+        String idToken = jwtTokenProvider.getUserIdFromToken(token);
+        if(idToken == null || !restaurant.getUser().getUserId().equals(idToken)){
+            throw new AccessDeniedException("Access denied, id does not match");
+        }
 
         menu.setRestaurant(restaurant);
 
@@ -61,7 +77,7 @@ public class MenuServiceImpl implements MenuService{
     }
 
     @Override
-    public MenuDTO updateMenu(String restaurantId, MenuDTO menuDTO, String menuId) {
+    public MenuDTO updateMenu(String restaurantId, MenuDTO menuDTO, String menuId, String token) {
 
         MenuModel menu = menuRepository
                 .findById(menuId)
@@ -75,6 +91,15 @@ public class MenuServiceImpl implements MenuService{
             throw new RestoAppException(HttpStatus.BAD_REQUEST, "The menu does not correspond to the restaurant");
         }
 
+        String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
+        if(roleToken == null || !roleToken.equals("ROLE_RESTO")){
+            throw new AccessDeniedException("access denied, role not allowed");
+        }
+
+        String idToken = jwtTokenProvider.getUserIdFromToken(token);
+        if(idToken == null || !idToken.equals(menu.getRestaurant().getUser().getUserId())){
+            throw new AccessDeniedException("Access denied, id does not match");
+        }
         menu.setMenuName(menuDTO.getMenuName());
         menu.setMenuDescription(menuDTO.getMenuDescription());
         menu.setMenuImage(menuDTO.getMenuImage());
@@ -95,7 +120,7 @@ public class MenuServiceImpl implements MenuService{
     }
 
     @Override
-    public void deleteMenu(String restaurantId, String menuId) {
+    public void deleteMenu(String restaurantId, String menuId, String token) {
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
@@ -106,6 +131,16 @@ public class MenuServiceImpl implements MenuService{
 
         if(!restaurantId.equals(menu.getRestaurant().getRestaurantId())){
             throw new RestoAppException(HttpStatus.BAD_REQUEST, "The menu does not correspond to the restaurant");
+        }
+
+        String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
+        if(roleToken == null || !roleToken.equals("ROLE_RESTO")){
+            throw new AccessDeniedException("access denied, role not allowed");
+        }
+
+        String idToken = jwtTokenProvider.getUserIdFromToken(token);
+        if(idToken == null || !idToken.equals(menu.getRestaurant().getUser().getUserId())){
+            throw new AccessDeniedException("Access denied, id does not match");
         }
 
         menuRepository.delete(menu);

@@ -18,7 +18,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/users/{userId}")
+    @GetMapping("/users/{userId}") //TODO: YA LISTO!!!!!
     public ResponseEntity<UserDTO> getUserById(@PathVariable String userId,
                                                @RequestHeader(value="Authorization") String authorizHeader){
         String token = authorizHeader.replace("Bearer ", "");
@@ -26,7 +26,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(userId, token));
     }
 
-    @PutMapping("/users/{userId}")
+    @PutMapping("/users/{userId}") //TODO: YA LISTO!!!!!
     public ResponseEntity<UserDTO> updateUser(@PathVariable String userId, @Valid @RequestBody UserDTO userDTO,
                                               @RequestHeader(value="Authorization") String authorizHeader){
         String token = authorizHeader.replace("Bearer ", "");
@@ -34,7 +34,7 @@ public class UserController {
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
-    @DeleteMapping("/users/{userId}")
+    @DeleteMapping("/users/{userId}") //TODO: YA LISTO!!!!!
     public ResponseEntity<String> deleteUser(@PathVariable String userId,
                                              @RequestHeader(value="Authorization") String authorizHeader){
         String token = authorizHeader.replace("Bearer ", "");
@@ -43,7 +43,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/admin/users/{userId}")
+    @PutMapping("/admin/users/{userId}") //TODO: YA LISTO!!!!!
     public ResponseEntity<AdminUserDTO> updateEnabled(@PathVariable String userId, @RequestBody AdminUserDTO userDTO,
                                                       @RequestHeader(value="Authorization") String authorizHeader){
         String token = authorizHeader.replace("Bearer ", "");
@@ -52,7 +52,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/username/{userName}")
+    @GetMapping("/admin/username/{userName}") //TODO: YA LISTO!!!!!
     public ResponseEntity<AdminUserDTO> getUserByUserName(@PathVariable String userName,
                                                           @RequestHeader(value="Authorization") String authorizHeader){
         String token = authorizHeader.replace("Bearer ", "");
@@ -60,7 +60,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(value = "/admin/useremail/{userEmail}")
+    @GetMapping(value = "/admin/useremail/{userEmail}") //TODO: YA LISTO!!!!!
     public ResponseEntity<AdminUserDTO> getUserByUserEmail(@PathVariable String userEmail,
                                                            @RequestHeader(value="Authorization") String authorizHeader){
         String token = authorizHeader.replace("Bearer ", "");
@@ -68,7 +68,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/users")
+    @GetMapping("/admin/users") //TODO: YA LISTO!!!!!
     public UserResponse userList(@RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
                                  @RequestParam(value = "pageSize", defaultValue = "9", required = false) int pageSize,
                                  @RequestHeader(value="Authorization") String authorizHeader){
@@ -78,7 +78,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/admin/users/{userId}/role")
+    @PutMapping("/admin/users/{userId}/role") //TODO: YA LISTO!!!!!
     public ResponseEntity<AdminUserDTO> updateRol(@PathVariable String userId, @RequestBody AdminUserDTO userDTO,
                                                   @RequestHeader(value="Authorization") String authorizHeader){
         String token = authorizHeader.replace("Bearer ", "");

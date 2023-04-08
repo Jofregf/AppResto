@@ -3,6 +3,7 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.AdminUserDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserResponse;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.DeleteBearerService;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -18,71 +21,69 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/users/{userId}") //TODO: YA LISTO!!!!!
-    public ResponseEntity<UserDTO> getUserById(@PathVariable String userId,
-                                               @RequestHeader(value="Authorization") String authorizHeader){
-        String token = authorizHeader.replace("Bearer ", "");
+    @Autowired
+    private DeleteBearerService deleteBearerService;
 
-        return ResponseEntity.ok(userService.getUserById(userId, token));
+    @GetMapping("/users")
+    public ResponseEntity<UserDTO> getUserById(@RequestHeader(value="Authorization") String authorizHeader){
+
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        return ResponseEntity.ok(userService.getUserById(token));
     }
 
-    @PutMapping("/users/{userId}") //TODO: YA LISTO!!!!!
-    public ResponseEntity<UserDTO> updateUser(@PathVariable String userId, @Valid @RequestBody UserDTO userDTO,
+    @PutMapping("/users")
+    public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UserDTO userDTO,
                                               @RequestHeader(value="Authorization") String authorizHeader){
-        String token = authorizHeader.replace("Bearer ", "");
-        UserDTO userResponse = userService.updateUser(userDTO, userId, token);
+
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        UserDTO userResponse = userService.updateUser(userDTO, token);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
-    @DeleteMapping("/users/{userId}") //TODO: YA LISTO!!!!!
-    public ResponseEntity<String> deleteUser(@PathVariable String userId,
-                                             @RequestHeader(value="Authorization") String authorizHeader){
-        String token = authorizHeader.replace("Bearer ", "");
-        userService.deleteUser(userId, token);
+    @DeleteMapping("/users")
+    public ResponseEntity<String> deleteUser(@RequestHeader(value="Authorization") String authorizHeader){
+
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        userService.deleteUser(token);
         return new ResponseEntity<>("User deleted succefull", HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/admin/users/{userId}") //TODO: YA LISTO!!!!!
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/admin/users/{userId}")
     public ResponseEntity<AdminUserDTO> updateEnabled(@PathVariable String userId, @RequestBody AdminUserDTO userDTO,
                                                       @RequestHeader(value="Authorization") String authorizHeader){
-        String token = authorizHeader.replace("Bearer ", "");
+
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
         AdminUserDTO userResponse = userService.updateEnabled(userDTO, userId, token);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/username/{userName}") //TODO: YA LISTO!!!!!
-    public ResponseEntity<AdminUserDTO> getUserByUserName(@PathVariable String userName,
-                                                          @RequestHeader(value="Authorization") String authorizHeader){
-        String token = authorizHeader.replace("Bearer ", "");
-        return ResponseEntity.ok(userService.findByUserName(userName, token));
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping(value = "/admin/useremail/{userEmail}") //TODO: YA LISTO!!!!!
-    public ResponseEntity<AdminUserDTO> getUserByUserEmail(@PathVariable String userEmail,
-                                                           @RequestHeader(value="Authorization") String authorizHeader){
-        String token = authorizHeader.replace("Bearer ", "");
-        return ResponseEntity.ok(userService.findByUserEmail(userEmail, token));
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/users") //TODO: YA LISTO!!!!!
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/admin/users")
     public UserResponse userList(@RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
                                  @RequestParam(value = "pageSize", defaultValue = "9", required = false) int pageSize,
                                  @RequestHeader(value="Authorization") String authorizHeader){
 
-        String token = authorizHeader.replace("Bearer ", "");
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
         return userService.getUsers(pageNumber, pageSize, token);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/admin/users/{userId}/role") //TODO: YA LISTO!!!!!
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/admin/users/{userId}/role")
     public ResponseEntity<AdminUserDTO> updateRol(@PathVariable String userId, @RequestBody AdminUserDTO userDTO,
                                                   @RequestHeader(value="Authorization") String authorizHeader){
-        String token = authorizHeader.replace("Bearer ", "");
+
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
         AdminUserDTO userResponse = userService.updateUserRole(userDTO, userId, token);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
+
+    @PreAuthorize(("hasRole('ROLE_ADMIN)"))
+    @GetMapping("/admin/users/search/{userNameOrEmail}")
+        public ResponseEntity<Optional<AdminUserDTO>> obtenerUsuarios(@PathVariable String userNameOrEmail,
+                                                                      @RequestHeader(value="Authorization") String authorizHeader){
+
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        return ResponseEntity.ok(userService.findByUserNameOrEmail(userNameOrEmail, token));
+        }
 }

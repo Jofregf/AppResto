@@ -1,6 +1,7 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.BookingDTO;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.BookingModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
@@ -10,15 +11,18 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.Rest
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.BookingRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.RestaurantRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,6 +37,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     private BookingDTO mapDTO(BookingModel bookingModel) {
 
@@ -59,15 +66,17 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDTO createBooking(BookingDTO bookingDTO, String restaurantId, String userId) {
+    public BookingDTO createBooking(BookingDTO bookingDTO, String restaurantId, String token) {
+
+        String idToken = jwtTokenProvider.getUserIdFromToken(token);
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
 
         UserModel user = userRepository
-                .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+                .findById(idToken)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", idToken));
 
         BookingModel booking = mapEntity(bookingDTO);
 
@@ -124,44 +133,59 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public void deleteBooking(String bookingId, String userId, String restaurantId) {
+    public void deleteBooking(String bookingId, String token) {
 
-        UserModel user = userRepository
-                .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-
-        RestaurantModel restaurant = restaurantRepository
-                .findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
 
         BookingModel booking = bookingRepository
                 .findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking", "Id", bookingId));
 
-        if (!userId.equals(booking.getUser().getUserId()) || !restaurantId.equals(booking.getRestaurant().getRestaurantId())) {
-            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The user or restaurant does not correspond to the booking");
+        if(userId == null || !userId.equals(booking.getUser().getUserId())){
+            throw new AccessDeniedException("Access denied, user does not correspond to the booking");
+        }
+
+        UserModel user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+        String restaurantId = booking.getRestaurant().getRestaurantId();
+
+        RestaurantModel restaurant = restaurantRepository
+                .findById(restaurantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
+
+        if (!restaurant.getRestaurantId().equals(booking.getRestaurant().getRestaurantId())) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The restaurant does not correspond to the booking");
         }
 
         bookingRepository.delete(booking);
     }
 
     @Override
-    public BookingDTO updateBooking(BookingDTO bookingDTO, String userId, String restaurantId, String bookingId) {
+    public BookingDTO updateBooking(BookingDTO bookingDTO, String bookingId, String token) {
+
+        String userId =  jwtTokenProvider.getUserIdFromToken(token);
 
         UserModel user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
-        RestaurantModel restaurant = restaurantRepository
-                .findById(restaurantId)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
-
         BookingModel booking = bookingRepository
                 .findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking", "Id", bookingId));
 
-        if (!userId.equals(booking.getUser().getUserId()) || !restaurantId.equals(booking.getRestaurant().getRestaurantId())) {
-            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The user or restaurant does not correspond to the booking");
+        if(userId == null || !userId.equals(booking.getUser().getUserId())){
+            throw new AccessDeniedException("Access denied, user does not correspond to the booking");
+        }
+
+        String restaurantId = booking.getRestaurant().getRestaurantId();
+        RestaurantModel restaurant = restaurantRepository
+                .findById(restaurantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
+
+        if (!restaurant.getRestaurantId().equals(booking.getRestaurant().getRestaurantId())) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The restaurant does not correspond to the booking");
         }
 
         int totalCapacity = restaurant.getRestaurantCapacity();
@@ -201,11 +225,22 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDTO> findBookingByUserId(String userId) {
+    public List<BookingDTO> findBookingByUserId(String token) {
+
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
+
+        UserModel user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
         List<BookingModel> bookings = bookingRepository.findByUser_UserId(userId);
 
-        List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
+        List<BookingDTO> listBookings = bookings.stream()
+                .map(booking -> mapDTO(booking)).collect(Collectors.toList());
+
+        if(userId == null){
+            throw new AccessDeniedException("Access denied, user does not correspond to the booking");
+        }
 
         if (listBookings.isEmpty()) {
             throw new ResourceNotFoundException("Bookings", "User Id", userId);
@@ -215,51 +250,83 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDTO> findBookingByRestaurantId(String restaurantId) {
+    public List<BookingDTO> findBookingByRestaurantName(String restaurantName, String token) {
 
-        List<BookingModel> bookings = bookingRepository.findByRestaurant_RestaurantId(restaurantId);
+        String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
+        if(roleToken == null || !roleToken.equals("ROLE_RESTO")){
+            throw new AccessDeniedException("access denied, role not allowed");
+        }
+
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
+        UserModel user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+        List<RestaurantModel> restaurantsList = restaurantRepository.findByUser_UserId(userId);
+        Optional<RestaurantModel> restaurant = restaurantsList.stream()
+                .filter(resto -> resto.getRestaurantName().equalsIgnoreCase(restaurantName))
+                .findFirst();
+        if(!restaurant.isPresent()){
+            throw new ResourceNotFoundException("Restaurant", "name", restaurantName);
+        }
+
+        List<BookingModel> bookings = bookingRepository.findByRestaurant_RestaurantNameContainingIgnoreCase(restaurantName);
 
         List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
 
         if (listBookings.isEmpty()) {
-            throw new ResourceNotFoundException("Bookings", "Restaurant Id", restaurantId);
+            throw new ResourceNotFoundException("Bookings", "Restaurant name", restaurantName);
+        }
+
+        return listBookings;
+
+    }
+
+    @Override
+    public List<BookingDTO> findByBookingDate(LocalDate date, String restaurantName, String token) {
+
+        String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
+        if(roleToken == null || !roleToken.equals("ROLE_RESTO")){
+            throw new AccessDeniedException("access denied, role not allowed");
+        }
+
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
+
+        UserModel user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+        RestaurantModel restaurant = restaurantRepository
+                .findByUser_UserIdAndRestaurantNameContainingIgnoreCase(userId, restaurantName)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "name", restaurantName));
+
+        List<BookingModel> bookings = bookingRepository.findByBookingDateAndRestaurant_RestaurantName(date, restaurant.getRestaurantName());
+
+        List<BookingDTO> listBookings = bookings
+                .stream()
+                .map(booking -> mapDTO(booking))
+                .collect(Collectors.toList());
+
+        if (listBookings.isEmpty()) {
+            throw new ResourceNotFoundException("Bookings", "Date and Restaurant Name", date + " and " + restaurantName);
         }
 
         return listBookings;
     }
 
-    @Override
-    public List<BookingDTO> findByBookingDate(LocalDate date) {
-
-        List<BookingModel> bookings = bookingRepository.findByBookingDate(date);
-
-        List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
-
-        if (listBookings.isEmpty()) {
-            throw new ResourceNotFoundException("Bookings", "Date", date);
-        }
-
-        return listBookings;
-    }
-
-    @Override
-    public List<BookingDTO> getAllBookings() {
-
-        List<BookingModel> bookings = bookingRepository.findAll();
-
-        List<BookingDTO> listBookings = bookings.stream().map(booking -> mapDTO(booking)).collect(Collectors.toList());
-
-        return listBookings;
-    }
-
-    @Scheduled(fixedDelay = 86400000)
+    @Scheduled(fixedDelay = 1296000000)
     public void updateBookingStatus() {
         LocalDate currentDate = LocalDate.now();
+        LocalDate updateActiveDate = currentDate.plusDays(7);
+        LocalDate deleteInactiveDate = currentDate.minusDays(30);
         List<BookingModel> bookings = bookingRepository.findAll();
         for (BookingModel booking : bookings) {
-            if (booking.getBookingDate().isBefore(currentDate)) {
+            if (booking.getBookingDate().isBefore(updateActiveDate)) {
                 booking.setActive(false);
                 bookingRepository.save(booking);
+                if(booking.getBookingDate().isBefore(deleteInactiveDate)){
+                    bookingRepository.delete(booking);
+                }
             }
         }
     }

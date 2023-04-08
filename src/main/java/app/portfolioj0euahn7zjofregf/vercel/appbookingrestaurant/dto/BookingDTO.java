@@ -1,5 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,16 +26,19 @@ public class BookingDTO {
 
     private boolean isActive;
 
+    private RestaurantModel restaurant;
+
     public BookingDTO() {
     }
 
     public BookingDTO(String bookingId, LocalDate bookingDate, LocalTime bookingTime,
-                      int bookingPartySize, boolean isActive) {
+                      int bookingPartySize, boolean isActive, RestaurantModel restaurant) {
         this.bookingId = bookingId;
         this.bookingDate = bookingDate;
         this.bookingTime = bookingTime;
         this.bookingPartySize = bookingPartySize;
         this.isActive = isActive;
+        this.restaurant = restaurant;
     }
 
     public String getBookingId() {
@@ -75,5 +79,13 @@ public class BookingDTO {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public RestaurantModel getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurant(RestaurantModel restaurant) {
+        this.restaurant = restaurant;
     }
 }

@@ -11,11 +11,11 @@ public interface RestaurantService {
 
     public RestaurantDTO getRestaurantById(String restaurantId);
 
-    public RestaurantDTO createRestaurant(String userId, RestaurantDTO restaurantDTO, String token);
+    public RestaurantDTO createRestaurant(RestaurantDTO restaurantDTO, String token);
 
-    public RestaurantDTO updateRestaurant(String userId, String restaurantId, RestaurantDTO restaurant, String token);
+    public RestaurantDTO updateRestaurant(String restaurantId, RestaurantDTO restaurant, String token);
 
-    public void deleteRestaurant(String userId, String restaurantId, String token);
+    public void deleteRestaurant(String restaurantId, String token);
 
     public RestaurantDTO updateEnabled(RestaurantDTO restaurantDTO, String restaurantId, String token);
 

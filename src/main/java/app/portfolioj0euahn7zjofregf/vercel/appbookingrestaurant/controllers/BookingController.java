@@ -2,10 +2,12 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.BookingDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.BookingService;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.DeleteBearerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -18,50 +20,62 @@ public class BookingController {
     @Autowired
     private BookingService bookingService;
 
-    @PostMapping("/user/{userId}/restaurant/{restaurantId}/booking")
-    public ResponseEntity<BookingDTO> createBooking(@PathVariable String userId,
-                                                @PathVariable String restaurantId,
-                                                @Valid @RequestBody BookingDTO bookingDTO){
+    @Autowired
+    private DeleteBearerService deleteBearerService;
 
-        return new ResponseEntity<>(bookingService.createBooking(bookingDTO, restaurantId, userId), HttpStatus.CREATED);
+    @PostMapping("/bookings/restaurant/{restaurantId}") //TODO: LISTO
+    public ResponseEntity<BookingDTO> createBooking(@PathVariable String restaurantId,
+                                                    @Valid @RequestBody BookingDTO bookingDTO,
+                                                    @RequestHeader(value="Authorization") String authorizHeader){
+
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        return new ResponseEntity<>(bookingService.createBooking(bookingDTO, restaurantId, token), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/user/{userId}/restaurant/{restaurantId}/booking/{bookingId}")
-    public ResponseEntity<String> deleteBooking(@PathVariable String userId,
-                                                @PathVariable String restaurantId,
-                                                @PathVariable String bookingId){
+    @DeleteMapping("/bookings/{bookingId}") //TODO: LISTO!!!!!!!
+    public ResponseEntity<String> deleteBooking(@PathVariable String bookingId,
+                                                @RequestHeader(value="Authorization") String authorizHeader){
 
-        bookingService.deleteBooking(bookingId, userId, restaurantId);
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        bookingService.deleteBooking(bookingId, token);
         return new ResponseEntity<>("Booking deleted successfully", HttpStatus.OK);
     }
 
-    @PutMapping("/user/{userId}/restaurant/{restaurantId}/booking/{bookingId}")
-    public ResponseEntity<BookingDTO> updateBooking(@PathVariable String userId,
-                                                    @PathVariable String restaurantId,
-                                                    @PathVariable String bookingId,
-                                                    @Valid @RequestBody BookingDTO bookingDTO){
+    @PutMapping("/bookings/{bookingId}")//TODO: LISTO!!!!!!!
+    public ResponseEntity<BookingDTO> updateBooking(@PathVariable String bookingId,
+                                                    @Valid @RequestBody BookingDTO bookingDTO,
+                                                    @RequestHeader(value="Authorization") String authorizHeader){
 
-        BookingDTO bookingResponse = bookingService.updateBooking(bookingDTO, userId, restaurantId, bookingId);
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        BookingDTO bookingResponse = bookingService.updateBooking(bookingDTO, bookingId, token);
         return new ResponseEntity<>(bookingResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/user/{userId}/booking")
-    public List<BookingDTO> listBookingByUserId(@PathVariable String userId){
-        return bookingService.findBookingByUserId(userId);
+//    @GetMapping("/user/{userId}/booking")
+    @GetMapping("/bookings")//TODO: LISTO!!!!!!!
+    public List<BookingDTO> listBookingByUserId(@RequestHeader(value="Authorization") String authorizHeader){
+
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        return bookingService.findBookingByUserId(token);
     }
 
-    @GetMapping("/restaurant/{restaurantId}/booking")
-    public List<BookingDTO> listBookingByRestaurantId(@PathVariable String restaurantId){
-        return bookingService.findBookingByRestaurantId(restaurantId);
+    @PreAuthorize("hasRole('ROLE_RESTO')")//TODO: LISTO!!!!!!!
+    @GetMapping("/restaurants/{restaurantName}/bookings")
+    public List<BookingDTO> listBookingByRestaurantId(@PathVariable String restaurantName,
+                                                      @RequestHeader(value="Authorization") String authorizHeader){
+
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        return bookingService.findBookingByRestaurantName(restaurantName, token);
     }
 
-    @GetMapping("/booking/date/{date}")
-    public List<BookingDTO> listBookingByDate(@PathVariable LocalDate date){
-        return bookingService.findByBookingDate(date);
+    @PreAuthorize("hasRole('ROLE_RESTO')")//TODO: LISTO!!!!!!!
+    @GetMapping("restaurants/{restaurantName}/bookings/{date}")
+    public List<BookingDTO> listBookingByDate(@PathVariable String restaurantName,
+                                              @PathVariable LocalDate date,
+                                              @RequestHeader(value="Authorization") String authorizHeader){
+
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        return bookingService.findByBookingDate(date, restaurantName, token);
     }
 
-    @GetMapping("/booking")
-    public List<BookingDTO> listBookings(){
-        return bookingService.getAllBookings();
-    }
 }

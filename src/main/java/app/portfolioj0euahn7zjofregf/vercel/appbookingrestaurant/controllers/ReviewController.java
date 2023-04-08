@@ -1,6 +1,7 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.ReviewDTO;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.DeleteBearerService;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.ReviewService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,42 +18,41 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
-    @PostMapping("/user/{userId}/restaurant/{restaurantId}/review")
-    public ResponseEntity<ReviewDTO> saveReview(@PathVariable(value = "userId")String userId,
-                                                @PathVariable(value = "restaurantId")String restaurantId,
-                                                @Valid @RequestBody ReviewDTO reviewDTO){
+    @Autowired
+    private DeleteBearerService deleteBearerService;
 
-        return new ResponseEntity<>(reviewService.createReview(userId, restaurantId, reviewDTO), HttpStatus.CREATED);
+    @PostMapping("/reviews/restaurant/{restaurantId}")
+    public ResponseEntity<ReviewDTO> saveReview(@PathVariable(value = "restaurantId")String restaurantId,
+                                                @Valid @RequestBody ReviewDTO reviewDTO,
+                                                @RequestHeader(value="Authorization") String authorizHeader){
+
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        return new ResponseEntity<>(reviewService.createReview(restaurantId, reviewDTO, token), HttpStatus.CREATED);
     }
 
-    @PutMapping("/review/{userId}/{reviewId}")
+    @PutMapping("/reviews/{reviewId}")
     public ResponseEntity<ReviewDTO> updateReview(@PathVariable String reviewId,
-                                                  @PathVariable String userId,
-                                                  @Valid @RequestBody ReviewDTO reviewDTO){
+                                                  @Valid @RequestBody ReviewDTO reviewDTO,
+                                                  @RequestHeader(value="Authorization") String authorizHeader){
 
-        ReviewDTO reviewResponse = reviewService.updateReview(reviewId, reviewDTO, userId);
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        ReviewDTO reviewResponse = reviewService.updateReview(reviewId, reviewDTO, token);
         return new ResponseEntity<>(reviewResponse, HttpStatus.OK);
     }
 
-    @DeleteMapping("/review/{userId}/{reviewId}")
-    public ResponseEntity<String> deleteReview(@PathVariable String reviewId, @PathVariable String userId){
-        reviewService.deleteReview(reviewId, userId);
+    @DeleteMapping("/reviews/{reviewId}")
+    public ResponseEntity<String> deleteReview(@PathVariable String reviewId,
+                                               @RequestHeader(value="Authorization") String authorizHeader){
+
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        reviewService.deleteReview(reviewId, token);
         return new ResponseEntity<>("Review deleted succefully", HttpStatus.OK);
     }
 
-    @GetMapping("/reviews")
-    public List<ReviewDTO> getReviews(){
-        return reviewService.getReviews();
-    }
-
-    @GetMapping("/restaurant/{restaurantId}/reviews")
+    @GetMapping("/restaurants/{restaurantId}/reviews")
     public List<ReviewDTO> listReviewsByRestaurant(@PathVariable String restaurantId){
         return reviewService.findReviewsByRestaurantId(restaurantId);
     }
 
-    @GetMapping("/user/{userId}/reviews")
-    public List<ReviewDTO> listReviewsByUser(@PathVariable String userId){
-        return reviewService.findReviewsByUserId(userId);
-    }
 
 }

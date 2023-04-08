@@ -9,6 +9,7 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.Reso
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.RestaurantRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.ReviewRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,9 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Autowired
     private RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     private ReviewDTO mapDTO(ReviewModel reviewModel){
 
@@ -52,10 +56,11 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public ReviewDTO createReview(String userId, String restaurantId, ReviewDTO reviewDTO) {
+    public ReviewDTO createReview(String restaurantId, ReviewDTO reviewDTO, String token) {
 
         ReviewModel review = mapEntity(reviewDTO);
 
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -73,19 +78,20 @@ public class ReviewServiceImpl implements ReviewService{
         Double avgRating = reviewRepository.getAverageRatingForRestaurant(restaurantId);
         avgRating = avgRating == null ? 0.0 : avgRating;
 
-        restaurant.setAverageRanting(avgRating);
+        restaurant.setAverageRanting((double) Math.round(avgRating));
         restaurantRepository.save(restaurant);
 
         return mapDTO(newReview);
     }
 
     @Override
-    public ReviewDTO updateReview(String reviewId, ReviewDTO reviewDTO, String userId) {
+    public ReviewDTO updateReview(String reviewId, ReviewDTO reviewDTO, String token) {
 
         ReviewModel review = reviewRepository
                 .findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review", "Id", reviewId));
 
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -94,7 +100,7 @@ public class ReviewServiceImpl implements ReviewService{
             throw new RestoAppException(HttpStatus.BAD_REQUEST, "The review does not belong to the user.");
         }
 
-        int oldRating = review.getRatingReview();
+//        int oldRating = review.getRatingReview();
         int newRating = reviewDTO.getRatingReview();
         review.setRatingReview(newRating);
         review.setCommentReview(reviewDTO.getCommentReview());
@@ -103,19 +109,20 @@ public class ReviewServiceImpl implements ReviewService{
         RestaurantModel restaurant = review.getRestaurant();
         Double avgRating = reviewRepository.getAverageRatingForRestaurant(restaurant.getRestaurantId());
         avgRating = avgRating == null ? 0.0 : avgRating;
-        restaurant.setAverageRanting(avgRating);
+        restaurant.setAverageRanting((double) Math.round(avgRating));
         restaurantRepository.save(restaurant);
 
         return mapDTO(reviewUpdate);
     }
 
     @Override
-    public void deleteReview(String reviewId, String userId) {
+    public void deleteReview(String reviewId, String token) {
 
         ReviewModel review = reviewRepository
                 .findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review", "Id", reviewId));
 
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -124,15 +131,6 @@ public class ReviewServiceImpl implements ReviewService{
             throw new RestoAppException(HttpStatus.BAD_REQUEST, "The review does not belong to the user.");
         }
         reviewRepository.delete(review);
-    }
-
-    @Override
-    public List<ReviewDTO> getReviews() {
-
-        List<ReviewModel> reviews = reviewRepository.findAll();
-        List<ReviewDTO> reviewList = reviews.stream().map(review -> mapDTO(review)).collect(Collectors.toList());
-
-        return reviewList;
     }
 
     @Override
@@ -149,16 +147,4 @@ public class ReviewServiceImpl implements ReviewService{
         return listReviews;
     }
 
-    @Override
-    public List<ReviewDTO> findReviewsByUserId(String userId) {
-
-        List<ReviewModel> reviews = reviewRepository.findByUser_UserId(userId);
-
-        List<ReviewDTO> listReviews = reviews.stream().map(review -> mapDTO(review)).collect(Collectors.toList());
-
-        if(listReviews.isEmpty()){
-            throw new ResourceNotFoundException("Reviews", "Id", userId);
-        }
-        return listReviews;
-    }
 }

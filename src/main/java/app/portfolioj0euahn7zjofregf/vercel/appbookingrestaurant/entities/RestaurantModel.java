@@ -97,6 +97,7 @@ public class RestaurantModel {
         return restaurantName;
     }
 
+
     public void setRestaurantName(String restaurantName) {
         this.restaurantName = restaurantName;
     }

@@ -115,10 +115,11 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public RestaurantDTO createRestaurant(String userId, RestaurantDTO restaurantDTO, String token ) {
+    public RestaurantDTO createRestaurant(RestaurantDTO restaurantDTO, String token ) {
 
         RestaurantModel restaurant = mapEntity(restaurantDTO);
 
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -141,13 +142,14 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public RestaurantDTO updateRestaurant(String userId, String restaurantId, RestaurantDTO restaurantDTO,
+    public RestaurantDTO updateRestaurant(String restaurantId, RestaurantDTO restaurantDTO,
                                           String token) {
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
 
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -181,12 +183,13 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public void deleteRestaurant(String userId, String restaurantId, String token) {
+    public void deleteRestaurant(String restaurantId, String token) {
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
 
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));

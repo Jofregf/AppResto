@@ -2,6 +2,7 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantResponse;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.DeleteBearerService;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.RestaurantService;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.utilities.AppConstants;
 import jakarta.validation.Valid;
@@ -21,7 +22,10 @@ public class RestaurantController {
     @Autowired
     private RestaurantService restaurantService;
 
-    @GetMapping("/restaurants") //TODO: YA LISTO!!!!!
+    @Autowired
+    private DeleteBearerService deleteBearerService;
+
+    @GetMapping("/restaurants")
     public RestaurantResponse restaurantsList(@RequestParam(value = "pageNumber", defaultValue = AppConstants.DEFAULT_NUMBER_PAGE, required = false)int pageNumber,
                                               @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
                                               @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
@@ -30,13 +34,13 @@ public class RestaurantController {
         return restaurantService.getRestaurants(pageNumber, pageSize, sortBy, sortDir);
     }
 
-    @GetMapping("/restaurants/{restaurantId}") //TODO: YA LISTO!!!!!
+    @GetMapping("/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantDTO> getRestaurantById(@PathVariable String restaurantId){
 
         return ResponseEntity.ok(restaurantService.getRestaurantById(restaurantId));
     }
 
-    @GetMapping("/menus/restaurants") //TODO: YA LISTO!!!!!
+    @GetMapping("/menus/restaurants")
     public List<RestaurantDTO> listRestaurantsByMenu(@RequestHeader(value="menuName") String menuName){
 
         return restaurantService.findRestaurantsByMenuName(menuName);
@@ -49,37 +53,32 @@ public class RestaurantController {
     }
 
     @PreAuthorize("hasRole('ROLE_RESTO')")
-    @PostMapping("/restaurants") //TODO: YA LISTO!!!!!
-    public ResponseEntity<RestaurantDTO> saveRestaurant(@RequestHeader(value = "userId")String userId,
-                                                        @Valid @RequestBody RestaurantDTO restaurantDTO,
+    @PostMapping("/restaurants")
+    public ResponseEntity<RestaurantDTO> saveRestaurant(@Valid @RequestBody RestaurantDTO restaurantDTO,
                                                         @RequestHeader(value="Authorization") String authorizHeader){
 
-        String token = authorizHeader.replace("Bearer ", "");
-        return new ResponseEntity<>(restaurantService.createRestaurant(userId, restaurantDTO, token), HttpStatus.CREATED);
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        return new ResponseEntity<>(restaurantService.createRestaurant(restaurantDTO, token), HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasRole('ROLE_RESTO')")
-    @PutMapping("/restaurants/{restaurantId}") //TODO: YA LISTO!!!!!
+    @PutMapping("/restaurants")
     public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable String restaurantId,
                                                           @Valid @RequestBody RestaurantDTO restaurantDTO,
-                                                          @RequestHeader(value="userId") String userId,
                                                           @RequestHeader(value="Authorization") String authorizHeader){
 
-        String token = authorizHeader.replace("Bearer ", "");
-
-        RestaurantDTO restaurantResponse = restaurantService.updateRestaurant(userId, restaurantId, restaurantDTO, token);
-
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        RestaurantDTO restaurantResponse = restaurantService.updateRestaurant(restaurantId, restaurantDTO, token);
         return new ResponseEntity<>(restaurantResponse, HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_RESTO')")
-    @DeleteMapping("/restaurants/{restaurantId}") //TODO: YA LISTO!!!!!
+    @DeleteMapping("/restaurants")
     public ResponseEntity<String> deleteRestaurant(@PathVariable String restaurantId,
-                                                   @RequestHeader(value="userId") String userId,
                                                    @RequestHeader(value="Authorization") String authorizHeader){
 
-        String token = authorizHeader.replace("Bearer ", "");
-        restaurantService.deleteRestaurant(userId, restaurantId, token);
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        restaurantService.deleteRestaurant(restaurantId, token);
         return new ResponseEntity<>("Restaurant deleted successfully", HttpStatus.OK);
 
     }
@@ -90,7 +89,7 @@ public class RestaurantController {
                                                       @RequestBody RestaurantDTO restaurantDTO,
                                                       @RequestHeader(value="Authorization") String authorizHeader){
 
-        String token = authorizHeader.replace("Bearer ", "");
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
         RestaurantDTO restaurantResponse = restaurantService.updateEnabled(restaurantDTO, restaurantId, token);
 
         return new ResponseEntity<>(restaurantResponse, HttpStatus.OK);

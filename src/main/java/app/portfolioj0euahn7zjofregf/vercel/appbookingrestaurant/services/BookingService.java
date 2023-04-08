@@ -7,18 +7,16 @@ import java.util.List;
 
 public interface BookingService {
 
-    public BookingDTO createBooking(BookingDTO booking, String restaurantId, String userId);
+    public BookingDTO createBooking(BookingDTO booking, String restaurantId, String token);
 
-    public void deleteBooking(String bookingId, String userId, String restaurantId);
+    public void deleteBooking(String bookingId, String token);
 
-    public BookingDTO updateBooking(BookingDTO DTO, String userId, String restaurantId, String bookingId);
+    public BookingDTO updateBooking(BookingDTO DTO, String bookingId, String token);
 
-    public List<BookingDTO> findBookingByUserId(String userId);
+    public List<BookingDTO> findBookingByUserId(String token);
 
-    public List<BookingDTO> findBookingByRestaurantId(String restaurantId);
+    public List<BookingDTO> findBookingByRestaurantName(String restaurantName, String token);
 
-    public List<BookingDTO> findByBookingDate (LocalDate date);
-
-    public List<BookingDTO> getAllBookings();
+    public List<BookingDTO> findByBookingDate (LocalDate date, String restaurantName, String token);
 
 }

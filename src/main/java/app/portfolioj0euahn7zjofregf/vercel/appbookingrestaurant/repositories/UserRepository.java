@@ -7,10 +7,6 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<UserModel, String> {
 
-    public UserModel findByUserNameContainingIgnoreCase(String userName);
-
-    public UserModel findByUserEmailContainingIgnoreCase(String email);
-
     public Boolean existsByUserName(String userName);
 
     public Boolean existsByUserEmail(String email);

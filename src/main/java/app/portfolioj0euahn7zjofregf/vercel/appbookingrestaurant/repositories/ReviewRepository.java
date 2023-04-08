@@ -11,8 +11,6 @@ public interface ReviewRepository extends JpaRepository<ReviewModel, String> {
 
     public List<ReviewModel> findByRestaurant_RestaurantId(String restaurantId);
 
-    public List<ReviewModel> findByUser_UserId(String userId);
-
     @Query("SELECT AVG(r.ratingReview) FROM ReviewModel r WHERE r.restaurant.restaurantId = :restaurantId")
     Double getAverageRatingForRestaurant(@Param("restaurantId") String restaurantId);
 }

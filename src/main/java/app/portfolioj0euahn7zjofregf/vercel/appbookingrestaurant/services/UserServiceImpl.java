@@ -62,6 +62,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RoleRepository roleRepository;
 
+
     @Override
     public UserResponse getUsers(int pageNumber, int pageSize, String token) {
 
@@ -90,8 +91,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserById(String userId, String token) {
+    public UserDTO getUserById(String token) {
 
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -105,8 +107,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO updateUser(UserDTO userDTO, String userId, String token) {
+    public UserDTO updateUser(UserDTO userDTO, String token) {
 
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -129,8 +132,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(String userId, String token) {
+    public void deleteUser(String token) {
 
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
@@ -163,42 +167,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AdminUserDTO findByUserName(String userName, String token) {
-
-        UserModel user = userRepository.findByUserNameContainingIgnoreCase(userName);
-        if(user.getUserName().isEmpty() || !user.getUserName().equals(userName)){
-            throw new ResourceNotFoundException("User", "username", userName);
-        }
-
-        String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
-        if(roleToken == null || !roleToken.equals("ROLE_ADMIN")){
-            throw new AccessDeniedException("Access denied");
-        }
-
-        AdminUserDTO userRole = mapAdminDTO(user);
-        userRole.getRole();
-        return userRole;
-    }
-
-    @Override
-    public AdminUserDTO findByUserEmail(String email, String token) {
-
-        UserModel user = userRepository.findByUserEmailContainingIgnoreCase(email);
-        if(user == null){
-            throw new ResourceNotFoundException("User", "email", email);
-        }
-
-        String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
-        if(roleToken == null || !roleToken.equals("ROLE_ADMIN")){
-            throw new AccessDeniedException("Access denied");
-        }
-
-        AdminUserDTO userRole = mapAdminDTO(user);
-        userRole.getRole();
-        return userRole;
-    }
-
-    @Override
     public AdminUserDTO updateUserRole(AdminUserDTO adminUserDTO, String userId, String token) {
 
         UserModel user = userRepository
@@ -225,5 +193,21 @@ public class UserServiceImpl implements UserService {
 
         return mapAdminDTO(user);
 
+    }
+
+    @Override
+    public Optional<AdminUserDTO> findByUserNameOrEmail(String userNameOrEmail, String token) {
+
+        String userRole = jwtTokenProvider.getUserRoleFromToken(token);
+        if(userRole == null || !userRole.equals("ROLE_ADMIN")){
+            throw new AccessDeniedException("Access denied");
+        }
+
+        Optional <UserModel> userOtional = userRepository
+                .findByUserEmailOrUserNameContainingIgnoreCase(userNameOrEmail, userNameOrEmail);
+
+        UserModel user = userOtional.orElseThrow(() -> new ResourceNotFoundException("User", "email or username", userNameOrEmail));
+
+        return Optional.of(mapAdminDTO(user));
     }
 }

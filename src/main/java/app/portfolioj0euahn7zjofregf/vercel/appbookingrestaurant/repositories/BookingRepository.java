@@ -1,7 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.BookingModel;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;

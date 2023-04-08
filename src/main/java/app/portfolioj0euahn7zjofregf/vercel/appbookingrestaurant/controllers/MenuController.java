@@ -1,6 +1,7 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.MenuDTO;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.DeleteBearerService;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.MenuService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,11 @@ public class MenuController {
     @Autowired
     private MenuService menuService;
 
+    @Autowired
+    private DeleteBearerService deleteBearerService;
+
     @PreAuthorize("hasRole('ROLE_RESTO')")
-    @PostMapping("/menus/restaurant/{restaurantId}") //TODO: YA LISTO!!!!!
+    @PostMapping("/menus/restaurant/{restaurantId}")
     public ResponseEntity<MenuDTO> saveMenu(@PathVariable String restaurantId,
                                             @Valid @RequestBody MenuDTO menuDTO,
                                             @RequestHeader(value="Authorization") String authorizHeader) {
@@ -29,42 +33,42 @@ public class MenuController {
     }
 
     @PreAuthorize("hasRole('ROLE_RESTO')")
-    @PutMapping("/menus/{menuId}/restaurant/{restaurantId}")//TODO: YA LISTO!!!!!
+    @PutMapping("/menus/{menuId}/restaurant/{restaurantId}")
     public ResponseEntity<MenuDTO> updateMenu(@PathVariable String restaurantId,
                                               @PathVariable String menuId,
                                               @Valid @RequestBody MenuDTO menuDTO,
                                               @RequestHeader(value="Authorization") String authorizHeader){
 
-        String token = authorizHeader.replace("Bearer ", "");
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
         MenuDTO menuResponse = menuService.updateMenu(restaurantId, menuDTO, menuId, token);
 
         return new ResponseEntity<>(menuResponse, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ROLE_RESTO')") //TODO: YA LISTO!!!!!
+    @PreAuthorize("hasRole('ROLE_RESTO')")
     @DeleteMapping("/menus/{menuId}/restaurant/{restaurantId}")
     public ResponseEntity<String> deleteMenu(@PathVariable String restaurantId, @PathVariable String menuId,
                                              @RequestHeader(value="Authorization") String authorizHeader){
 
-        String token = authorizHeader.replace("Bearer ", "");
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
         menuService.deleteMenu(restaurantId, menuId, token);
 
         return new ResponseEntity<>("Menu deleted successfully", HttpStatus.OK);
     }
 
-    @GetMapping("/menus/restaurant/{restaurantId}") //TODO: YA LISTO!!!!!
+    @GetMapping("/menus/restaurant/{restaurantId}")
     public List<MenuDTO> listMenuByRestaurantId(@PathVariable String restaurantId){
 
         return menuService.findMenuByRestaurantId(restaurantId);
     }
 
-    @GetMapping("/menus") //TODO: YA LISTO!!!!!
+    @GetMapping("/menus")
     public List<MenuDTO> listMenuByName(@RequestHeader(value="menuName") String menuName){
 
         return menuService.getMenuByName(menuName);
     }
 
-    @GetMapping("/menus/{menuId}") //TODO: YA LISTO!!!!!
+    @GetMapping("/menus/{menuId}")
     public ResponseEntity<MenuDTO> getMenuById(@PathVariable String menuId){
 
         return ResponseEntity.ok(menuService.getMenuById(menuId));

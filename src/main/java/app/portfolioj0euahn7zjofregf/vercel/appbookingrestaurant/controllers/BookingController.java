@@ -23,7 +23,7 @@ public class BookingController {
     @Autowired
     private DeleteBearerService deleteBearerService;
 
-    @PostMapping("/bookings/restaurant/{restaurantId}") //TODO: LISTO
+    @PostMapping("/bookings/restaurant/{restaurantId}")
     public ResponseEntity<BookingDTO> createBooking(@PathVariable String restaurantId,
                                                     @Valid @RequestBody BookingDTO bookingDTO,
                                                     @RequestHeader(value="Authorization") String authorizHeader){
@@ -32,7 +32,7 @@ public class BookingController {
         return new ResponseEntity<>(bookingService.createBooking(bookingDTO, restaurantId, token), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/bookings/{bookingId}") //TODO: LISTO!!!!!!!
+    @DeleteMapping("/bookings/{bookingId}")
     public ResponseEntity<String> deleteBooking(@PathVariable String bookingId,
                                                 @RequestHeader(value="Authorization") String authorizHeader){
 
@@ -41,7 +41,7 @@ public class BookingController {
         return new ResponseEntity<>("Booking deleted successfully", HttpStatus.OK);
     }
 
-    @PutMapping("/bookings/{bookingId}")//TODO: LISTO!!!!!!!
+    @PutMapping("/bookings/{bookingId}")
     public ResponseEntity<BookingDTO> updateBooking(@PathVariable String bookingId,
                                                     @Valid @RequestBody BookingDTO bookingDTO,
                                                     @RequestHeader(value="Authorization") String authorizHeader){
@@ -52,14 +52,14 @@ public class BookingController {
     }
 
 //    @GetMapping("/user/{userId}/booking")
-    @GetMapping("/bookings")//TODO: LISTO!!!!!!!
+    @GetMapping("/bookings")
     public List<BookingDTO> listBookingByUserId(@RequestHeader(value="Authorization") String authorizHeader){
 
         String token = deleteBearerService.deleteBearerText(authorizHeader);
         return bookingService.findBookingByUserId(token);
     }
 
-    @PreAuthorize("hasRole('ROLE_RESTO')")//TODO: LISTO!!!!!!!
+    @PreAuthorize("hasRole('ROLE_RESTO')")
     @GetMapping("/restaurants/{restaurantName}/bookings")
     public List<BookingDTO> listBookingByRestaurantId(@PathVariable String restaurantName,
                                                       @RequestHeader(value="Authorization") String authorizHeader){
@@ -68,7 +68,7 @@ public class BookingController {
         return bookingService.findBookingByRestaurantName(restaurantName, token);
     }
 
-    @PreAuthorize("hasRole('ROLE_RESTO')")//TODO: LISTO!!!!!!!
+    @PreAuthorize("hasRole('ROLE_RESTO')")
     @GetMapping("restaurants/{restaurantName}/bookings/{date}")
     public List<BookingDTO> listBookingByDate(@PathVariable String restaurantName,
                                               @PathVariable LocalDate date,

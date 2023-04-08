@@ -84,7 +84,7 @@ public class RestaurantController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PutMapping("/admin/restaurants/{restaurantId}") //TODO: YA LISTO!!!!!
+    @PutMapping("/admin/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantDTO> updateEnable(@PathVariable String restaurantId,
                                                       @RequestBody RestaurantDTO restaurantDTO,
                                                       @RequestHeader(value="Authorization") String authorizHeader){

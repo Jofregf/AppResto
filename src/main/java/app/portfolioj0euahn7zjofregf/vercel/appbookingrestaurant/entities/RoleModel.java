@@ -1,11 +1,7 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities;
 
 import jakarta.persistence.*;
-import org.apache.catalina.User;
 import org.hibernate.annotations.GenericGenerator;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "roles")

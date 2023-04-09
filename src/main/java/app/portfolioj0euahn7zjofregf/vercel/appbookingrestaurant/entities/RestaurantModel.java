@@ -1,5 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "restaurantId")
 @Table(name="restaurants")
 public class RestaurantModel {
 
@@ -52,6 +54,7 @@ public class RestaurantModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
+    @JsonIgnore
     private UserModel user;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)

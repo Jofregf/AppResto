@@ -1,6 +1,8 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.BookingDTO;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.BookingUserInfoDTO;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantUserInfoDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.BookingModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
@@ -48,6 +50,7 @@ public class BookingServiceImpl implements BookingService {
         bookingDTO.setBookingTime(bookingModel.getBookingTime());
         bookingDTO.setBookingPartySize(bookingModel.getBookingPartySize());
         bookingDTO.setActive(bookingModel.isActive());
+        bookingDTO.setRestaurant(bookingModel.getRestaurant());
 
         return bookingDTO;
     }
@@ -63,6 +66,25 @@ public class BookingServiceImpl implements BookingService {
 
         return booking;
     }
+
+    private BookingUserInfoDTO mapUserInfo(BookingModel bookingModel){
+        BookingUserInfoDTO bookingUserInfoDTO = new BookingUserInfoDTO();
+        bookingUserInfoDTO.setBookingId(bookingModel.getBookingId());
+        bookingUserInfoDTO.setBookingDate(bookingModel.getBookingDate());
+        bookingUserInfoDTO.setBookingTime(bookingModel.getBookingTime());
+        bookingUserInfoDTO.setBookingPartySize(bookingModel.getBookingPartySize());
+        bookingUserInfoDTO.setActive(bookingModel.isActive());
+
+        RestaurantUserInfoDTO restaurantUserInfoDTO = new RestaurantUserInfoDTO();
+        restaurantUserInfoDTO.setRestaurantName(bookingModel.getRestaurant().getRestaurantName());
+        restaurantUserInfoDTO.setRestaurantAddress(bookingModel.getRestaurant().getRestaurantAddress());
+        restaurantUserInfoDTO.setRestaurantPhone(bookingModel.getRestaurant().getRestaurantPhone());
+        restaurantUserInfoDTO.setRestaurantEmail(bookingModel.getRestaurant().getRestaurantEmail());
+
+        bookingUserInfoDTO.setRestaurant(restaurantUserInfoDTO);
+
+        return bookingUserInfoDTO;
+        }
 
     @Override
     public BookingDTO createBooking(BookingDTO bookingDTO, String restaurantId, String token) {
@@ -224,7 +246,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDTO> findBookingByUserId(String token) {
+    public List<BookingUserInfoDTO> findBookingByUserId(String token) {
 
         String userId = jwtTokenProvider.getUserIdFromToken(token);
 
@@ -234,8 +256,8 @@ public class BookingServiceImpl implements BookingService {
 
         List<BookingModel> bookings = bookingRepository.findByUser_UserId(userId);
 
-        List<BookingDTO> listBookings = bookings.stream()
-                .map(booking -> mapDTO(booking)).collect(Collectors.toList());
+        List<BookingUserInfoDTO> listBookings = bookings.stream()
+                .map(booking -> mapUserInfo(booking)).collect(Collectors.toList());
 
         if(userId == null){
             throw new AccessDeniedException("Access denied, user does not correspond to the booking");
@@ -316,7 +338,7 @@ public class BookingServiceImpl implements BookingService {
     @Scheduled(fixedDelay = 1296000000)
     public void updateBookingStatus() {
         LocalDate currentDate = LocalDate.now();
-        LocalDate updateActiveDate = currentDate.plusDays(7);
+        LocalDate updateActiveDate = currentDate.minusDays(7);
         LocalDate deleteInactiveDate = currentDate.minusDays(30);
         List<BookingModel> bookings = bookingRepository.findAll();
         for (BookingModel booking : bookings) {

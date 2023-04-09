@@ -1,6 +1,7 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.BookingDTO;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.BookingUserInfoDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.BookingService;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.DeleteBearerService;
 import jakarta.validation.Valid;
@@ -53,7 +54,7 @@ public class BookingController {
 
 //    @GetMapping("/user/{userId}/booking")
     @GetMapping("/bookings")
-    public List<BookingDTO> listBookingByUserId(@RequestHeader(value="Authorization") String authorizHeader){
+    public List<BookingUserInfoDTO> listBookingByUserId(@RequestHeader(value="Authorization") String authorizHeader){
 
         String token = deleteBearerService.deleteBearerText(authorizHeader);
         return bookingService.findBookingByUserId(token);

@@ -1,6 +1,7 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.BookingDTO;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.BookingUserInfoDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,7 +14,7 @@ public interface BookingService {
 
     public BookingDTO updateBooking(BookingDTO DTO, String bookingId, String token);
 
-    public List<BookingDTO> findBookingByUserId(String token);
+    public List<BookingUserInfoDTO> findBookingByUserId(String token);
 
     public List<BookingDTO> findBookingByRestaurantName(String restaurantName, String token);
 

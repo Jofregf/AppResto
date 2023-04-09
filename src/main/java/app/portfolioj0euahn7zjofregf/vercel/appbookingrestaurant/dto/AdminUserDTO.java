@@ -58,6 +58,14 @@ public class AdminUserDTO {
         this.role = role;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public RoleModel getRole() {
+        return role;
+    }
+
     public String getUserName() {
         return userName;
     }
@@ -77,14 +85,4 @@ public class AdminUserDTO {
     public String getUserEmail() {
         return userEmail;
     }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public RoleModel getRole() {
-        return role;
-    }
-
-
 }

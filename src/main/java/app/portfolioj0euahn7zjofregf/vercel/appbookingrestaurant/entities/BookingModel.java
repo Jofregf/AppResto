@@ -1,5 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities;
 
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -18,10 +19,12 @@ public class BookingModel {
 
     @ManyToOne
     @JoinColumn(name = "userId", columnDefinition = "VARCHAR(50)")
+    @JsonIgnore
     private UserModel user;
 
     @ManyToOne
     @JoinColumn(name = "restaurantId", columnDefinition = "VARCHAR(50)")
+    @JsonIgnore
     private RestaurantModel restaurant;
 
     @Column(name = "booking_date", nullable = false)

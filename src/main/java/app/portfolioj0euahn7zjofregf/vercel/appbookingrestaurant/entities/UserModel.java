@@ -19,13 +19,13 @@ public class UserModel {
     @Column(name = "user_name", unique = true, nullable = false, columnDefinition = "VARCHAR(50)")
     private String userName;
 
-    @Column(name = "first_name", nullable = false, columnDefinition = "VARCHAR(50)")
+    @Column(name = "first_name", nullable = true, columnDefinition = "VARCHAR(50)")
     private String firstName;
 
-    @Column(name = "last_name", nullable = false, columnDefinition = "VARCHAR(50)")
+    @Column(name = "last_name", nullable = true, columnDefinition = "VARCHAR(50)")
     private String lastName;
 
-    @Column(name = "user_phone", nullable = false, columnDefinition = "VARCHAR(50)")
+    @Column(name = "user_phone", nullable = true, columnDefinition = "VARCHAR(50)")
     private String userPhone;
 
     @Column(name = "user_email", nullable = false, unique = true, columnDefinition = "VARCHAR(50)")

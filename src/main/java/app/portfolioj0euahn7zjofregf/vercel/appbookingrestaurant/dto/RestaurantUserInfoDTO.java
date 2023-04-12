@@ -1,8 +1,5 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-
 public class RestaurantUserInfoDTO {
 
     private String restaurantName;

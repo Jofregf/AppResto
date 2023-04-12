@@ -1,9 +1,11 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -85,6 +87,6 @@ public class CustomUserDetails implements UserDetails {
                 userModel.getUserEmail(),
                 userModel.getUserPassword(),
                 authorities);
-
     }
+
 }

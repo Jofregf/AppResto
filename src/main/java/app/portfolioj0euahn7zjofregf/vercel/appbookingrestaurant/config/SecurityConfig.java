@@ -4,6 +4,7 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.Custom
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtAuthenticationEntryPoint;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -67,6 +68,17 @@ public class SecurityConfig {
 
 
         return http.build();
+    }
+
+    @Bean
+    public FilterRegistrationBean<CORSFilter> corsFilterFilterRegistrationBean(){
+        FilterRegistrationBean<CORSFilter> registrationBean = new FilterRegistrationBean<>();
+        CORSFilter corsFilter = new CORSFilter();
+        registrationBean.setFilter(corsFilter);
+        registrationBean.setOrder(Integer.MIN_VALUE);
+        registrationBean.addUrlPatterns("/*");
+
+        return registrationBean;
     }
 
 //    @Autowired

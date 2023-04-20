@@ -53,6 +53,7 @@ public class RestaurantServiceImpl implements RestaurantService{
         restaurantDTO.setRestaurantCapacity(restaurantModel.getRestaurantCapacity());
         restaurantDTO.setEnabled(restaurantModel.getEnabled());
         restaurantDTO.setAverageRanting(restaurantModel.getAverageRanting());
+        restaurantDTO.setReviews(restaurantModel.getReviews());
         return restaurantDTO;
     }
 

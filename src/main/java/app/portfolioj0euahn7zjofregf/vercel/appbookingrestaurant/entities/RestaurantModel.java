@@ -200,4 +200,12 @@ public class RestaurantModel {
     public void setBookings(Set<BookingModel> bookings) {
         this.bookings = bookings;
     }
+
+    public Set<ReviewModel> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Set<ReviewModel> reviews) {
+        this.reviews = reviews;
+    }
 }

@@ -1,5 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.Range;
@@ -23,10 +24,12 @@ public class ReviewModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
+    @JsonIgnore
     private UserModel user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurantId", nullable = false)
+    @JsonIgnore
     private RestaurantModel restaurant;
 
 

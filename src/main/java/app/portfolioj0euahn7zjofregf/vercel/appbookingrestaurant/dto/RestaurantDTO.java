@@ -1,10 +1,12 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.ReviewModel;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.Set;
 
 public class RestaurantDTO {
 
@@ -47,6 +49,8 @@ public class RestaurantDTO {
     private boolean enabled;
 
     private Double averageRating;
+
+    private Set<ReviewModel> reviews;
 
     public RestaurantDTO() {
     }
@@ -163,6 +167,14 @@ public class RestaurantDTO {
 
     public void setAverageRanting(Double averageRanting) {
         this.averageRating = averageRanting;
+    }
+
+    public Set<ReviewModel> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Set<ReviewModel> reviews) {
+        this.reviews = reviews;
     }
 
     @Override

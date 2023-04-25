@@ -1,5 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 

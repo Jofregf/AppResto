@@ -56,21 +56,18 @@ public class MenuController {
         return new ResponseEntity<>("Menu deleted successfully", HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ROLE_RESTO')")
+    @GetMapping("/menus")
+    public List<MenuDTO> listMenuByName(@RequestHeader(value="menuName") String menuName,
+                                        @RequestHeader(value="Authorization") String authorizHeader){
+
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        return menuService.getMenuByName(menuName, token);
+    }
+
     @GetMapping("/menus/restaurant/{restaurantId}")
     public List<MenuDTO> listMenuByRestaurantId(@PathVariable String restaurantId){
 
         return menuService.findMenuByRestaurantId(restaurantId);
-    }
-
-    @GetMapping("/menus")
-    public List<MenuDTO> listMenuByName(@RequestHeader(value="menuName") String menuName){
-
-        return menuService.getMenuByName(menuName);
-    }
-
-    @GetMapping("/menus/{menuId}")
-    public ResponseEntity<MenuDTO> getMenuById(@PathVariable String menuId){
-
-        return ResponseEntity.ok(menuService.getMenuById(menuId));
     }
 }

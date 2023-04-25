@@ -177,11 +177,11 @@ public class RestaurantModel {
         this.enabled = enabled;
     }
 
-    public Double getAverageRanting() {
+    public Double getAverageRating() {
         return averageRating;
     }
 
-    public void setAverageRanting(Double averageRanting) {
+    public void setAverageRating(Double averageRanting) {
         this.averageRating = averageRanting;
     }
 

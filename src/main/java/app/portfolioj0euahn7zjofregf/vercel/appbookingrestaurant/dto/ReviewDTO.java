@@ -1,5 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
 import jakarta.validation.constraints.*;
 
 public class ReviewDTO {
@@ -15,13 +16,16 @@ public class ReviewDTO {
     @Size(min = 10, message = "You must enter a comment of at least 10 characters")
     private String commentReview;
 
+    private String userName;
+
     public ReviewDTO() {
     }
 
-    public ReviewDTO(String reviewId, int ratingReview, String commentReview, String userId, String restaurantId) {
+    public ReviewDTO(String reviewId, int ratingReview, String commentReview, String userName) {
         this.reviewId = reviewId;
         this.ratingReview = ratingReview;
         this.commentReview = commentReview;
+        this.userName = userName;
     }
 
     public String getReviewId() {
@@ -46,6 +50,14 @@ public class ReviewDTO {
 
     public void setCommentReview(String commentReview) {
         this.commentReview = commentReview;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     @Override

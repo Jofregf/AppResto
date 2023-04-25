@@ -39,6 +39,7 @@ public class ReviewServiceImpl implements ReviewService{
         reviewDTO.setReviewId(reviewModel.getReviewId());
         reviewDTO.setRatingReview(reviewModel.getRatingReview());
         reviewDTO.setCommentReview(reviewModel.getCommentReview());
+        reviewDTO.setUserName(reviewModel.getUser().getUserName());
 
         return reviewDTO;
     }
@@ -49,7 +50,6 @@ public class ReviewServiceImpl implements ReviewService{
         review.setReviewId(reviewDTO.getReviewId());
         review.setRatingReview(reviewDTO.getRatingReview());
         review.setCommentReview(reviewDTO.getCommentReview());
-
 
 
         return review;
@@ -78,7 +78,7 @@ public class ReviewServiceImpl implements ReviewService{
         Double avgRating = reviewRepository.getAverageRatingForRestaurant(restaurantId);
         avgRating = avgRating == null ? 0.0 : avgRating;
 
-        restaurant.setAverageRanting((double) Math.round(avgRating));
+        restaurant.setAverageRating((double) Math.round(avgRating));
         restaurantRepository.save(restaurant);
 
         return mapDTO(newReview);
@@ -100,7 +100,6 @@ public class ReviewServiceImpl implements ReviewService{
             throw new RestoAppException(HttpStatus.BAD_REQUEST, "The review does not belong to the user.");
         }
 
-//        int oldRating = review.getRatingReview();
         int newRating = reviewDTO.getRatingReview();
         review.setRatingReview(newRating);
         review.setCommentReview(reviewDTO.getCommentReview());
@@ -109,7 +108,7 @@ public class ReviewServiceImpl implements ReviewService{
         RestaurantModel restaurant = review.getRestaurant();
         Double avgRating = reviewRepository.getAverageRatingForRestaurant(restaurant.getRestaurantId());
         avgRating = avgRating == null ? 0.0 : avgRating;
-        restaurant.setAverageRanting((double) Math.round(avgRating));
+        restaurant.setAverageRating((double) Math.round(avgRating));
         restaurantRepository.save(restaurant);
 
         return mapDTO(reviewUpdate);

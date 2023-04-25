@@ -40,16 +40,18 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.getRestaurantById(restaurantId));
     }
 
-    @GetMapping("/menus/restaurants")
+    @GetMapping("/search/menus/restaurants")
     public List<RestaurantDTO> listRestaurantsByMenu(@RequestHeader(value="menuName") String menuName){
-
+        System.out.println(menuName + "<-----");
         return restaurantService.findRestaurantsByMenuName(menuName);
     }
 
-    @GetMapping("/booking/{bookingId}/restaurant")
-    public RestaurantDTO findRestaurantByBooking(@PathVariable String bookingId){
+    @GetMapping("/bookings/{bookingId}/restaurant")
+    public RestaurantDTO findRestaurantByBooking(@PathVariable String bookingId,
+                                                 @RequestHeader(value="Authorization") String authorizHeader){
 
-        return restaurantService.findRestaurantByBookingId(bookingId);
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        return restaurantService.findRestaurantByBookingId(bookingId, token);
     }
 
     @PreAuthorize("hasRole('ROLE_RESTO')")
@@ -62,7 +64,7 @@ public class RestaurantController {
     }
 
     @PreAuthorize("hasRole('ROLE_RESTO')")
-    @PutMapping("/restaurants")
+    @PutMapping("/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantDTO> updateRestaurant(@PathVariable String restaurantId,
                                                           @Valid @RequestBody RestaurantDTO restaurantDTO,
                                                           @RequestHeader(value="Authorization") String authorizHeader){
@@ -73,7 +75,7 @@ public class RestaurantController {
     }
 
     @PreAuthorize("hasRole('ROLE_RESTO')")
-    @DeleteMapping("/restaurants")
+    @DeleteMapping("/restaurants/{restaurantId}")
     public ResponseEntity<String> deleteRestaurant(@PathVariable String restaurantId,
                                                    @RequestHeader(value="Authorization") String authorizHeader){
 

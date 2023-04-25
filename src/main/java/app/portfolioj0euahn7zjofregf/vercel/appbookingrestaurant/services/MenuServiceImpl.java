@@ -48,6 +48,7 @@ public class MenuServiceImpl implements MenuService{
         menu.setMenuDescription(menuDTO.getMenuDescription());
         menu.setMenuImage(menuDTO.getMenuImage());
 
+
         return menu;
     }
 
@@ -111,16 +112,6 @@ public class MenuServiceImpl implements MenuService{
     }
 
     @Override
-    public MenuDTO getMenuById(String menuId) {
-
-        MenuModel menu = menuRepository
-                .findById(menuId)
-                .orElseThrow(() -> new ResourceNotFoundException("Menu", "Id", menuId));
-
-        return mapDTO(menu);
-    }
-
-    @Override
     public void deleteMenu(String restaurantId, String menuId, String token) {
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
@@ -162,9 +153,24 @@ public class MenuServiceImpl implements MenuService{
     }
 
     @Override
-    public List<MenuDTO> getMenuByName(String menuName) {
+    public List<MenuDTO> getMenuByName(String menuName, String token) {
 
-        List<MenuModel> menus = menuRepository.findByMenuNameContainingIgnoreCase(menuName);
+        String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
+        if(roleToken == null || !roleToken.equals("ROLE_RESTO")){
+            throw new AccessDeniedException("access denied, role not allowed");
+        }
+
+        String idToken = jwtTokenProvider.getUserIdFromToken(token);
+
+        List<MenuModel> menus = menuRepository.findByMenuNameContainingIgnoreCaseAndRestaurant_User_UserId(menuName, idToken);
+
+        for(MenuModel menu:menus){
+            if(!menu.getRestaurant().getUser().getUserId().equals(idToken)){
+                System.out.println(menu.getRestaurant().getUser().getUserId());
+                System.out.println(idToken);
+                throw new AccessDeniedException("access denied");
+            }
+        }
 
         List<MenuDTO> listMenus = menus.stream().map(menu -> mapDTO(menu)).collect(Collectors.toList());
 

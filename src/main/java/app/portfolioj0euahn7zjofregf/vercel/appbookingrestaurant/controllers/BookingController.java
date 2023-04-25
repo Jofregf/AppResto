@@ -52,7 +52,6 @@ public class BookingController {
         return new ResponseEntity<>(bookingResponse, HttpStatus.OK);
     }
 
-//    @GetMapping("/user/{userId}/booking")
     @GetMapping("/bookings")
     public List<BookingUserInfoDTO> listBookingByUserId(@RequestHeader(value="Authorization") String authorizHeader){
 

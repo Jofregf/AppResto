@@ -2,10 +2,14 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantResponse;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.ReviewDTO;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.BookingModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.ReviewModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.ResourceNotFoundException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.RestoAppException;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.BookingRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.RestaurantRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.ReviewRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;
@@ -19,8 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +37,9 @@ public class RestaurantServiceImpl implements RestaurantService{
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -52,8 +58,10 @@ public class RestaurantServiceImpl implements RestaurantService{
         restaurantDTO.setRestaurantImages(restaurantModel.getRestaurantImages());
         restaurantDTO.setRestaurantCapacity(restaurantModel.getRestaurantCapacity());
         restaurantDTO.setEnabled(restaurantModel.getEnabled());
-        restaurantDTO.setAverageRanting(restaurantModel.getAverageRanting());
+        restaurantDTO.setAverageRating(restaurantModel.getAverageRating());
         restaurantDTO.setReviews(restaurantModel.getReviews());
+
+
         return restaurantDTO;
     }
 
@@ -71,7 +79,8 @@ public class RestaurantServiceImpl implements RestaurantService{
         restaurant.setRestaurantImages(restaurantDTO.getRestaurantImages());
         restaurant.setRestaurantCapacity(restaurantDTO.getRestaurantCapacity());
         restaurant.setEnabled(true);
-        restaurant.setAverageRanting(0.0);
+        restaurant.setAverageRating(0.0);
+        restaurant.setReviews(restaurantDTO.getReviews());
 
         return restaurant;
     }
@@ -244,9 +253,17 @@ public class RestaurantServiceImpl implements RestaurantService{
     }
 
     @Override
-    public RestaurantDTO findRestaurantByBookingId(String bookingId) {
+    public RestaurantDTO findRestaurantByBookingId(String bookingId, String token) {
+
+        String idToken = jwtTokenProvider.getUserIdFromToken(token);
+
+        Optional<BookingModel> booking = bookingRepository.findById(bookingId);
 
         Optional<RestaurantModel> restaurant = Optional.ofNullable(restaurantRepository.findByBookings_BookingId(bookingId));
+
+        if(!idToken.equals(booking.get().getUser().getUserId())) {
+            throw new ResourceNotFoundException("Booking", "User Id", idToken);
+        }
 
         if(!restaurant.isPresent()){
             throw new ResourceNotFoundException("Restaurant", "Booking Id", bookingId);

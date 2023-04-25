@@ -10,12 +10,10 @@ public interface MenuService {
 
     public MenuDTO updateMenu(String restaurantId, MenuDTO menuDTO, String menuId, String token);
 
-    public MenuDTO getMenuById(String menuId);
-
     public void deleteMenu(String restaurantId, String menuId, String token);
 
     public List<MenuDTO> findMenuByRestaurantId(String restaurantId);
 
-    public List<MenuDTO> getMenuByName(String menuName);
+    public List<MenuDTO> getMenuByName(String menuName, String Token);
 
 }

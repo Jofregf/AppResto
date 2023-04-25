@@ -1,5 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
@@ -59,4 +60,6 @@ public class MenuDTO {
     public void setMenuDescription(String menuDescription) {
         this.menuDescription = menuDescription;
     }
+
+
 }

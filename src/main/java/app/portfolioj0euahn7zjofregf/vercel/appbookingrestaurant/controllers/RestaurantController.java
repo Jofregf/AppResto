@@ -7,11 +7,14 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.Restau
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.utilities.AppConstants;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 
@@ -42,7 +45,6 @@ public class RestaurantController {
 
     @GetMapping("/search/menus/restaurants")
     public List<RestaurantDTO> listRestaurantsByMenu(@RequestHeader(value="menuName") String menuName){
-        System.out.println(menuName + "<-----");
         return restaurantService.findRestaurantsByMenuName(menuName);
     }
 
@@ -95,5 +97,9 @@ public class RestaurantController {
         RestaurantDTO restaurantResponse = restaurantService.updateEnabled(restaurantDTO, restaurantId, token);
 
         return new ResponseEntity<>(restaurantResponse, HttpStatus.OK);
+    }
+    @GetMapping("/restaurants/rating")
+    public List<RestaurantDTO> listRestaurantsByAverageRating(@RequestHeader(value="rating") Double averageRating){
+        return restaurantService.findRestaurantByAverageRating(averageRating);
     }
 }

@@ -15,4 +15,6 @@ public interface RestaurantRepository extends JpaRepository<RestaurantModel, Str
     public List<RestaurantModel> findByUser_UserId(String userId);
 
     public Optional<RestaurantModel> findByUser_UserIdAndRestaurantNameContainingIgnoreCase(String userId, String restaurantName);
+
+    public List<RestaurantModel> findByAverageRating(Double averageRating);
 }

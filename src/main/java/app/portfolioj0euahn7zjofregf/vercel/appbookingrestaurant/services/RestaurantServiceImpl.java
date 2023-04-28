@@ -2,10 +2,8 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RestaurantResponse;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.ReviewDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.BookingModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RestaurantModel;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.ReviewModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.ResourceNotFoundException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.RestoAppException;
@@ -23,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -270,5 +270,16 @@ public class RestaurantServiceImpl implements RestaurantService{
         }
 
         return mapDTO(restaurant.get());
+    }
+
+    @Override
+    public List<RestaurantDTO> findRestaurantByAverageRating(Double averageRating) {
+
+        List<RestaurantModel> restaurants = restaurantRepository.findByAverageRating(averageRating);
+        List<RestaurantDTO> listRestaurants = restaurants.stream().map(restaurant -> mapDTO(restaurant)).collect(Collectors.toList());
+        if(listRestaurants.isEmpty()){
+            throw new ResourceNotFoundException("Restaurant", "Average rating", averageRating.toString());
+        }
+        return listRestaurants;
     }
 }

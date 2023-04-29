@@ -46,8 +46,8 @@ public class AuthController {
                 );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtTokenProvider.generateToken(authentication);
-
-        return ResponseEntity.ok(new JwtAuthResponseDTO(token, "Bearer", "successful login"));
+        String role = jwtTokenProvider.getUserRoleFromToken(token);
+        return ResponseEntity.ok(new JwtAuthResponseDTO(token, "Bearer", "successful login", role));
     }
 
     @PostMapping("/register")

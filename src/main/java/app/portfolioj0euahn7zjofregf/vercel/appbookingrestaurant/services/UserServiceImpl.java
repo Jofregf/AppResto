@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
@@ -167,11 +168,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AdminUserDTO updateUserRole(AdminUserDTO adminUserDTO, String userId, String token) {
+    public AdminUserDTO updateUserRole(AdminUserDTO adminUserDTO, String usernameOrUserEmail, String token) {
 
-        UserModel user = userRepository
-                .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+        UserModel user = userRepository.findByUserEmailOrUserNameContainingIgnoreCase(usernameOrUserEmail, usernameOrUserEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with that username or email " + usernameOrUserEmail));
 
         String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
         if(roleToken == null || !roleToken.equals("ROLE_ADMIN")){

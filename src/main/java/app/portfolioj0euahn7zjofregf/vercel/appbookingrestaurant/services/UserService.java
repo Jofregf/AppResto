@@ -18,7 +18,7 @@ public interface UserService {
 
     public AdminUserDTO updateEnabled(AdminUserDTO adminUserDTO, String userId, String token);
 
-    public AdminUserDTO updateUserRole(AdminUserDTO adminUserDTO, String userId, String token);
+    public AdminUserDTO updateUserRole(AdminUserDTO adminUserDTO, String usernameOrUserEmail, String token);
 
     public Optional<AdminUserDTO> findByUserNameOrEmail(String userNameOrEmail, String token);
 }

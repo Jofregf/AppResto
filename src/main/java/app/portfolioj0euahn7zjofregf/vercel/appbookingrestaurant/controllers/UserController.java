@@ -69,12 +69,12 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PutMapping("/admin/users/{userId}/role")
-    public ResponseEntity<AdminUserDTO> updateRol(@PathVariable String userId, @RequestBody AdminUserDTO userDTO,
+    @PutMapping("/admin/users/{usernameOrUserEmail}/role")
+    public ResponseEntity<AdminUserDTO> updateRol(@PathVariable String usernameOrUserEmail, @RequestBody AdminUserDTO userDTO,
                                                   @RequestHeader(value="Authorization") String authorizHeader){
 
         String token = deleteBearerService.deleteBearerText(authorizHeader);
-        AdminUserDTO userResponse = userService.updateUserRole(userDTO, userId, token);
+        AdminUserDTO userResponse = userService.updateUserRole(userDTO, usernameOrUserEmail, token);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 

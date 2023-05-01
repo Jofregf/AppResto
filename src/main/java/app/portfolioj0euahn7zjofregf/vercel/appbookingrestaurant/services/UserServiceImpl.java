@@ -92,22 +92,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserById(String token) {
-
-        String userId = jwtTokenProvider.getUserIdFromToken(token);
-        UserModel user = userRepository
-                .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-
-        String idToken = jwtTokenProvider.getUserIdFromToken(token);
-        if(idToken == null || !idToken.equals(userId)){
-            throw new AccessDeniedException("Access denied");
-        }
-
-        return mapDTO(user);
-    }
-
-    @Override
     public UserDTO updateUser(UserDTO userDTO, String token) {
 
         String userId = jwtTokenProvider.getUserIdFromToken(token);
@@ -149,11 +133,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AdminUserDTO updateEnabled(AdminUserDTO adminUserDTO, String userId, String token) {
+    public AdminUserDTO updateEnabled(AdminUserDTO adminUserDTO, String usernameOrUserEmail, String token) {
 
-        UserModel user = userRepository
-                .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+        UserModel user = userRepository.findByUserEmailOrUserNameContainingIgnoreCase(usernameOrUserEmail, usernameOrUserEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with that username or email " + usernameOrUserEmail));
 
         String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
         if(roleToken == null || !roleToken.equals("ROLE_ADMIN")){
@@ -209,5 +192,15 @@ public class UserServiceImpl implements UserService {
         UserModel user = userOtional.orElseThrow(() -> new ResourceNotFoundException("User", "email or username", userNameOrEmail));
 
         return Optional.of(mapAdminDTO(user));
+    }
+
+    public UserDTO getUserById(String token) {
+
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
+        UserModel user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+        return mapDTO(user);
     }
 }

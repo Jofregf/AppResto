@@ -20,5 +20,5 @@ public interface UserService {
 
     public Optional<AdminUserDTO> findByUserNameOrEmail(String userNameOrEmail, String token);
 
-    public UserDTO getUserById (String token);
+    public UserDTO getUserById(String token);
 }

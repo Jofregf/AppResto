@@ -6,7 +6,6 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserRespons
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.DeleteBearerService;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.UserService;
 import jakarta.validation.Valid;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,8 +82,9 @@ public class UserController {
 
     @GetMapping("/users")
     public ResponseEntity<UserDTO> getUserById(@RequestHeader(value="Authorization") String authorizHeader){
+
         String token = deleteBearerService.deleteBearerText(authorizHeader);
-        UserDTO userResponse = userService.getUserById(token);
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        System.out.println(token);
+        return ResponseEntity.ok(userService.getUserById(token));
     }
 }

@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
         user.setLastName(userDTO.getLastName());
         user.setUserPhone(userDTO.getUserPhone());
         user.setUserEmail(userDTO.getUserEmail());
-        user.setUserPassword(userDTO.getUserPassword());
+        user.setUserPassword(user.getUserPassword());
 
         UserModel userUpdated = userRepository.save(user);
 
@@ -194,12 +194,18 @@ public class UserServiceImpl implements UserService {
         return Optional.of(mapAdminDTO(user));
     }
 
+    @Override
     public UserDTO getUserById(String token) {
 
         String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+        String idToken = jwtTokenProvider.getUserIdFromToken(token);
+        if(idToken == null || !idToken.equals(userId)){
+            throw new AccessDeniedException("Access denied");
+        }
 
         return mapDTO(user);
     }

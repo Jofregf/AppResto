@@ -282,4 +282,23 @@ public class RestaurantServiceImpl implements RestaurantService{
         }
         return listRestaurants;
     }
+
+    @Override
+    public List<RestaurantDTO> findRestaurantByUserId(String token) {
+
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
+
+        UserModel user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
+
+        List<RestaurantModel> restaurants = restaurantRepository.findByUser_UserId(userId);
+
+        List<RestaurantDTO> listRestaurants = restaurants.stream().map(restaurant -> mapDTO(restaurant)).collect(Collectors.toList());
+
+        if(listRestaurants.isEmpty()){
+            throw new ResourceNotFoundException("Restaurant", "User", userId);
+        }
+        return listRestaurants;
+    }
 }

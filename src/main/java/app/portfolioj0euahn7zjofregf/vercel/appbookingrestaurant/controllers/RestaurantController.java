@@ -102,4 +102,11 @@ public class RestaurantController {
     public List<RestaurantDTO> listRestaurantsByAverageRating(@RequestHeader(value="rating") Double averageRating){
         return restaurantService.findRestaurantByAverageRating(averageRating);
     }
+
+    @PreAuthorize("hasRole('ROLE_RESTO')")
+    @GetMapping("/restaurants/list")
+    public List<RestaurantDTO> listRestaurantsByUserId(@RequestHeader(value="Authorization") String authorizHeader){
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        return restaurantService.findRestaurantByUserId(token);
+    }
 }

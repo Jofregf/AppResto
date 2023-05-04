@@ -24,4 +24,6 @@ public interface RestaurantService {
     public RestaurantDTO findRestaurantByBookingId(String bookingId, String token);
 
     List<RestaurantDTO> findRestaurantByAverageRating(Double averageRating);
+
+    List<RestaurantDTO> findRestaurantByUserId(String token);
 }

@@ -61,7 +61,7 @@ public class BookingController {
 
     @PreAuthorize("hasRole('ROLE_RESTO')")
     @GetMapping("/restaurants/{restaurantName}/bookings")
-    public List<BookingDTO> listBookingByRestaurantId(@PathVariable String restaurantName,
+    public List<BookingDTO> listBookingByRestaurantName(@PathVariable String restaurantName,
                                                       @RequestHeader(value="Authorization") String authorizHeader){
 
         String token = deleteBearerService.deleteBearerText(authorizHeader);

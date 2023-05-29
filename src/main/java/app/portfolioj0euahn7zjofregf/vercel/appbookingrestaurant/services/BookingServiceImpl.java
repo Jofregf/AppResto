@@ -76,6 +76,7 @@ public class BookingServiceImpl implements BookingService {
         bookingUserInfoDTO.setActive(bookingModel.isActive());
 
         RestaurantUserInfoDTO restaurantUserInfoDTO = new RestaurantUserInfoDTO();
+        restaurantUserInfoDTO.setRestaurantId(bookingModel.getRestaurant().getRestaurantId());
         restaurantUserInfoDTO.setRestaurantName(bookingModel.getRestaurant().getRestaurantName());
         restaurantUserInfoDTO.setRestaurantAddress(bookingModel.getRestaurant().getRestaurantAddress());
         restaurantUserInfoDTO.setRestaurantPhone(bookingModel.getRestaurant().getRestaurantPhone());

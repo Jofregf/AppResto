@@ -2,6 +2,7 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
 public class RestaurantUserInfoDTO {
 
+    private String restaurantId;
     private String restaurantName;
 
     private String restaurantAddress;
@@ -14,7 +15,8 @@ public class RestaurantUserInfoDTO {
     }
 
     public RestaurantUserInfoDTO(String restaurantName, String restaurantAddress, String restaurantPhone,
-                                 String restaurantEmail) {
+                                 String restaurantEmail, String restaurantId) {
+        this.restaurantId = restaurantId;
         this.restaurantName = restaurantName;
         this.restaurantAddress = restaurantAddress;
         this.restaurantPhone = restaurantPhone;
@@ -51,5 +53,13 @@ public class RestaurantUserInfoDTO {
 
     public void setRestaurantEmail(String restaurantEmail) {
         this.restaurantEmail = restaurantEmail;
+    }
+
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
     }
 }

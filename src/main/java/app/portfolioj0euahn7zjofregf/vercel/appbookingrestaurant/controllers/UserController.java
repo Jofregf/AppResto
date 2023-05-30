@@ -1,8 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.AdminUserDTO;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserDTO;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserResponse;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.*;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.DeleteBearerService;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services.UserService;
 import jakarta.validation.Valid;
@@ -86,5 +84,22 @@ public class UserController {
         String token = deleteBearerService.deleteBearerText(authorizHeader);
         System.out.println(token);
         return ResponseEntity.ok(userService.getUserById(token));
+    }
+
+    @PutMapping("/users/password/{userNameOrEmail}")
+    public ResponseEntity<UserPasswordDTO> updatePass(@PathVariable String userNameOrEmail,
+                                                      @RequestBody UserPasswordDTO userPasswordDTO) {
+        System.out.println(userNameOrEmail);
+        System.out.println(userPasswordDTO.getUserPassword());
+        UserPasswordDTO userResponse = userService.updatePassword(userPasswordDTO, userNameOrEmail);
+        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+    }
+
+    @PutMapping("/users/forgotpassword")
+    public ResponseEntity<UserPasswordDTO> updatePass(@RequestBody UserNamePassDTO userNamePassDTO) {
+        System.out.println(userNamePassDTO);
+
+        UserPasswordDTO userResponse = userService.forgotPassword(userNamePassDTO);
+        return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 }

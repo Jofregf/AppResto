@@ -1,8 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services;
 
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.AdminUserDTO;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserDTO;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserResponse;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.*;
 
 import java.util.Optional;
 
@@ -21,4 +19,9 @@ public interface UserService {
     public Optional<AdminUserDTO> findByUserNameOrEmail(String userNameOrEmail, String token);
 
     public UserDTO getUserById(String token);
+
+    public UserPasswordDTO updatePassword(UserPasswordDTO userPasswordDTO, String userNameOrEmail);
+
+    public UserPasswordDTO forgotPassword(UserNamePassDTO userNamePassDTO);
+
 }

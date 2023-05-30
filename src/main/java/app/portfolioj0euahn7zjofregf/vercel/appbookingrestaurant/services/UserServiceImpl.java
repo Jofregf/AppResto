@@ -1,9 +1,7 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services;
 
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.*;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtTokenProvider;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.AdminUserDTO;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserDTO;
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.UserResponse;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RoleModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.ResourceNotFoundException;
@@ -15,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -54,6 +53,14 @@ public class UserServiceImpl implements UserService {
         return adminUserDTO;
     }
 
+    private UserPasswordDTO mapPass(UserModel userModel){
+
+        UserPasswordDTO userPasswordDTO = new UserPasswordDTO();
+        userPasswordDTO.setUserPassword(userModel.getUserPassword());
+
+        return userPasswordDTO;
+    }
+
     @Autowired
     private UserRepository userRepository;
 
@@ -63,6 +70,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponse getUsers(int pageNumber, int pageSize, String token) {
@@ -208,5 +217,47 @@ public class UserServiceImpl implements UserService {
         }
 
         return mapDTO(user);
+    }
+
+    @Override
+    public UserPasswordDTO updatePassword(UserPasswordDTO userPasswordDTO,String userNameOrEmail) {
+
+        Optional <UserModel> userOtional = userRepository
+                .findByUserEmailOrUserNameContainingIgnoreCase(userNameOrEmail, userNameOrEmail);
+        UserModel user = userOtional.orElseThrow(() -> new ResourceNotFoundException("User", "email or username", userNameOrEmail));
+
+        user.setUserPassword(passwordEncoder.encode(userPasswordDTO.getUserPassword()));
+
+        UserModel userUpdated = userRepository.save(user);
+
+        return mapPass(userUpdated);
+    }
+
+    @Override
+    public UserPasswordDTO forgotPassword(UserNamePassDTO userNamePassDTO) {
+
+        String userNameOrEmail = userNamePassDTO.getUsernameOrEmail();
+        Optional <UserModel> userOtional = userRepository
+                .findByUserEmailOrUserNameContainingIgnoreCase(userNameOrEmail, userNameOrEmail);
+        UserModel user = userOtional.orElseThrow(() -> new ResourceNotFoundException("User", "email or username", userNameOrEmail));
+
+        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        Random random = new Random();
+        int length = random.nextInt(15 - 8 + 1) + 8;
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            char randomChar = CHARACTERS.charAt(randomIndex);
+            sb.append(randomChar);
+        }
+
+        String password = sb.toString();
+
+        user.setUserPassword(passwordEncoder.encode(password));
+
+        UserModel userUpdated = userRepository.save(user);
+
+        return mapPass(userUpdated);
     }
 }

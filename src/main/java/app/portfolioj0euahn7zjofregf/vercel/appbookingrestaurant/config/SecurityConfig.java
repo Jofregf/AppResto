@@ -61,7 +61,9 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.GET, "/api/restaurants", "/api/restaurants/**", "/api/menus/**", "/api/search/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/restaurants", "/api/restaurants/**", "/api/menus/**",
+                        "/api/search/**").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/users/password/**", "/api/users/forgotpassword").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/restaurants/**").hasRole("RESTO")
                 .requestMatchers(HttpMethod.PUT, "/api/restaurants/**").hasRole("RESTO")

@@ -10,3 +10,4 @@
 * JWT
 * jackson-databind
 * jaxb-api
+* Java Mail Sender

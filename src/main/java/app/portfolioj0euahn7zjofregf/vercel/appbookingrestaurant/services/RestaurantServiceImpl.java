@@ -12,6 +12,7 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.Re
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.ReviewRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtTokenProvider;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.utilities.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,6 +44,13 @@ public class RestaurantServiceImpl implements RestaurantService{
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    private EmailSender emailSender;
+
+    @Autowired
+    public RestaurantServiceImpl(EmailSender emailSender) {
+        this.emailSender = emailSender;
+    }
 
     private RestaurantDTO mapDTO(RestaurantModel restaurantModel) {
 
@@ -147,6 +155,21 @@ public class RestaurantServiceImpl implements RestaurantService{
         restaurant.setUser(user);
 
         RestaurantModel newRestaurant = restaurantRepository.save(restaurant);
+        String text = "Estimado " + user.getUserName() + ":<br><br>" +
+                "¡Felicitaciones por registrar el restaurante " +
+                "<span style=\"color: #F15422; font-size: 25px;\">" + restaurant.getRestaurantName()  +
+                "</span> en nuestra plataforma!<br><br>" +
+                "En el panel correspondiente, encontrará todas las herramientas necesarias para gestionarlo y " +
+                "promocionarlo. " +
+                "Estamos seguros de que su restaurante será un éxito y estamos aquí para apoyarlo en cada paso " +
+                "del camino.<br><br>" +
+                "Si necesita ayuda adicional o tiene alguna pregunta, no dude en ponerse en contacto con nuestro " +
+                "equipo de soporte. " +
+                "Estaremos encantados de brindarle asistencia personalizada.<br><br>" +
+                "Atentamente,<br>" +
+                "<span style=\"color: #F15422;\">Equipo de Resto-Reservas</span><br><br>";
+
+        emailSender.sendEmail(user.getUserEmail(), "Restaurante creado", text);
 
         return mapDTO(newRestaurant);
     }
@@ -189,6 +212,18 @@ public class RestaurantServiceImpl implements RestaurantService{
         restaurant.setRestaurantCapacity(restaurantDTO.getRestaurantCapacity());
 
         RestaurantModel restaurantUpdate = restaurantRepository.save(restaurant);
+
+        String message = "Estimado " + restaurant.getUser().getUserName() + ":<br><br>"
+                + "Queremos informarle que se han realizado modificaciones en los datos de su restaurante "
+                + "<span style=\"color: #F15422; font-size: 25px;\">"
+                + restaurant.getRestaurantName() + "</span>" + ". Le recomendamos revisar y verificar la precisión "
+                + "de los nuevos datos. "
+                + "Si encuentra alguna discrepancia o tiene alguna pregunta, no dude en ponerse en contacto con nuestro "
+                + "equipo de soporte.<br><br>"
+                + "Saludos cordiales,<br>"
+                + "<span style=\"color: #F15422;\">Equipo de Resto-Reservas</span><br><br>";
+
+        emailSender.sendEmail(restaurant.getUser().getUserEmail(), "Datos de restaurante modificados", message);
         return mapDTO(restaurantUpdate);
     }
 
@@ -217,6 +252,16 @@ public class RestaurantServiceImpl implements RestaurantService{
         if(!userId.equals(restaurant.getUser().getUserId())){
             throw new RestoAppException(HttpStatus.BAD_REQUEST, "The user is not the owner of the restaurant");
         }
+
+        String message = "Estimado " + restaurant.getUser().getUserName() + ":<br><br>"
+                + "Lamentamos que haya decidido eliminar su restaurante "
+                + "<span style=\"color: #F15422; font-size: 25px;\">"
+                + restaurant.getRestaurantName() + "</span>" + " de nuestra base de datos. " +
+                "Esperamos tenerlo de vuelta pronto.<br><br> "
+                + "Saludos cordiales,<br>"
+                + "<span style=\"color: #F15422;\">Equipo de Resto-Reservas</span><br><br>";
+        emailSender.sendEmail(restaurant.getUser().getUserEmail(), "Restaurante eliminado", message);
+
         restaurantRepository.delete(restaurant);
     }
 
@@ -235,6 +280,30 @@ public class RestaurantServiceImpl implements RestaurantService{
         restaurant.setEnabled(restaurantDTO.isEnabled());
 
         RestaurantModel updateRestaurant = restaurantRepository.save(restaurant);
+
+        if (!restaurant.getEnabled()) {
+            String message = "Estimado " + restaurant.getUser().getUserName() + ":<br><br>"
+                    + "Lamentamos informarle que se ha bloqueado la visibilidad de su restaurante "
+                    + "<span style=\"color: #F15422; font-size: 25px;\">"
+                    + restaurant.getRestaurantName() + "</span>" + " en nuestra plataforma debido a un incumplimiento de las " +
+                    "reglas de convivencia. Si considera que ha habido un error o desea que reevaluemos su situación, " +
+                    "le invitamos a responder a este correo electrónico y proporcionar una explicación detallada de su situación.<br><br>"
+                    + "Nos comprometemos a revisar cuidadosamente su caso y tomar las acciones apropiadas en base a la " +
+                    "información que nos proporcione. Agradecemos su cooperación y comprensión.<br><br>"
+                    + "Saludos cordiales,<br>"
+                    + "<span style=\"color: #F15422;\">Equipo de Resto-Reservas</span><br><br>";
+            emailSender.sendEmail(restaurant.getUser().getUserEmail(), "Bloqueo de visibilidad del restaurante", message);
+        } else {
+            String message = "Estimado " + restaurant.getUser().getUserName() + ":<br><br>"
+                    + "Luego de revisar su situación, hemos tomado la decisión de levantar la suspensión de su restaurante "
+                    + "<span style=\"color: #F15422; font-size: 25px;\">"
+                    + restaurant.getRestaurantName() + "</span>" + " y restaurar su visibilidad en nuestra plataforma.<br><br>"
+                    + "Agradecemos su cooperación y comprensión durante este proceso. Si tiene alguna pregunta adicional o " +
+                    "necesita más información, no dude en contactarnos.<br><br>"
+                    + "Saludos cordiales,<br>"
+                    + "<span style=\"color: #F15422;\">Equipo de Resto-Reservas</span><br><br>";
+            emailSender.sendEmail(restaurant.getUser().getUserEmail(), "Restaurante restaurado con visibilidad completa", message);
+        }
 
         return mapDTO(updateRestaurant);
     }

@@ -82,22 +82,19 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserById(@RequestHeader(value="Authorization") String authorizHeader){
 
         String token = deleteBearerService.deleteBearerText(authorizHeader);
-        System.out.println(token);
         return ResponseEntity.ok(userService.getUserById(token));
     }
 
-    @PutMapping("/users/password/{userNameOrEmail}")
-    public ResponseEntity<UserPasswordDTO> updatePass(@PathVariable String userNameOrEmail,
-                                                      @RequestBody UserPasswordDTO userPasswordDTO) {
-        System.out.println(userNameOrEmail);
-        System.out.println(userPasswordDTO.getUserPassword());
-        UserPasswordDTO userResponse = userService.updatePassword(userPasswordDTO, userNameOrEmail);
+    @PutMapping("/users/password")
+    public ResponseEntity<UserPasswordDTO> updatePass(@RequestBody UserPasswordDTO userPasswordDTO,
+                                                      @RequestHeader(value="Authorization") String authorizHeader) {
+        String token = deleteBearerService.deleteBearerText(authorizHeader);
+        UserPasswordDTO userResponse = userService.updatePassword(userPasswordDTO, token);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
     @PutMapping("/users/forgotpassword")
-    public ResponseEntity<UserPasswordDTO> updatePass(@RequestBody UserNamePassDTO userNamePassDTO) {
-        System.out.println(userNamePassDTO);
+    public ResponseEntity<UserPasswordDTO> forgotPass(@RequestBody UserNamePassDTO userNamePassDTO) {
 
         UserPasswordDTO userResponse = userService.forgotPassword(userNamePassDTO);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);

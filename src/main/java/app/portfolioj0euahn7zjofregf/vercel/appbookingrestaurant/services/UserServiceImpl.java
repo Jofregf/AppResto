@@ -7,6 +7,7 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserMo
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.ResourceNotFoundException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.RoleRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.utilities.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -72,6 +73,14 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+
+    private EmailSender emailSender;
+
+    @Autowired
+    public UserServiceImpl(EmailSender emailSender) {
+        this.emailSender = emailSender;
+    }
 
     @Override
     public UserResponse getUsers(int pageNumber, int pageSize, String token) {
@@ -156,6 +165,28 @@ public class UserServiceImpl implements UserService {
 
         UserModel userUpdated = userRepository.save(user);
 
+        if(user.getEnabled() == false) {
+            String message = "Estimado " + user.getUserName() + ":<br><br>"
+                    + "Lamentamos informarle que su cuenta ha sido suspendida debido a un incumplimiento de las reglas " +
+                    "de convivencia. Si considera que ha habido un error o desea que reevaluemos su situación, " +
+                    "le invitamos a responder a este correo electrónico y proporcionar una explicación detallada de " +
+                    "su situación.<br><br>"
+                    + "Nos comprometemos a revisar cuidadosamente su caso y tomar las acciones apropiadas en base a la " +
+                    "información que nos proporcione. Agradecemos su cooperación y entendimiento.<br><br>"
+                    + "Saludos cordiales,<br>"
+                    + "<span style=\"color: #F15422;\"> Equipo de Resto-Reservas </span><br><br>";
+            emailSender.sendEmail(user.getUserEmail(), "Baneado", message);
+
+        } else {
+            String message = "Estimado " + user.getUserName() + ":<br><br>"
+                    + "Luego de revisar su situación, hemos tomado la decisión de levantar la suspensión de su cuenta.<br><br>"
+                    + "Agradecemos su cooperación y entendimiento durante este proceso. Si tiene alguna pregunta adicional " +
+                    "o necesita más información, no dude en contactarnos.<br><br>"
+                    + "Saludos cordiales,<br>"
+                    + "<span style=\"color: #F15422;\"> Equipo de Resto-Reservas </span><br><br>";
+            emailSender.sendEmail(user.getUserEmail(), "Desbaneado", message);
+        }
+
         return mapAdminDTO(userUpdated);
     }
 
@@ -173,12 +204,43 @@ public class UserServiceImpl implements UserService {
         if("admin".equals(adminUserDTO.getRole().getRoleName())){
             RoleModel role = roleRepository.findByRoleName("ROLE_ADMIN").get();
             user.setRole(role);
+            String text = "Estimado " + user.getUserName() + ":<br><br>" +
+                    "Felicitaciones, ahora usted ha sido asignado como administrador en nuestra plataforma. " +
+                    "Al ingresar a su cuenta, podrá acceder a las herramientas y funciones pertinentes para gestionar " +
+                    "y administrar el sistema.<br><br>" +
+                    "Si necesita ayuda adicional o tiene alguna pregunta, no dude en ponerse en contacto con nuestro " +
+                    "equipo de soporte. Estaremos encantados de asistirle en todo lo que necesite.<br><br>" +
+                    "Atentamente,<br>" +
+                    "<span style=\"color: #F15422;\">Equipo de Resto-Reservas</span><br><br>";
+
+            emailSender.sendEmail(user.getUserEmail(), "Rol Administrador", text);
         } else if ("resto".equals(adminUserDTO.getRole().getRoleName())) {
             RoleModel role = roleRepository.findByRoleName("ROLE_RESTO").get();
             user.setRole(role);
+            String text = "Estimado " + user.getUserName() + ":<br><br>" +
+                    "Felicitaciones, ahora usted ha sido asignado como representante de un restaurante en nuestra plataforma. " +
+                    "Al ingresar a su cuenta, podrá acceder a las herramientas y funciones pertinentes para registrar, " +
+                    "gestionar y administrar su restaurante.<br><br>" +
+                    "Si necesita ayuda adicional o tiene alguna pregunta, no dude en ponerse en contacto con nuestro " +
+                    "equipo de soporte. Estaremos encantados de asistirle en todo lo que necesite.<br><br>" +
+                    "Atentamente,<br>" +
+                    "<span style=\"color: #F15422;\">Equipo de Resto-Reservas</span><br><br>";
+
+            emailSender.sendEmail(user.getUserEmail(), "Rol Restaurante", text);
         } else {
             RoleModel role = roleRepository.findByRoleName("ROLE_USER").get();
             user.setRole(role);
+
+            String text = "Estimado " + user.getUserName() + ":<br><br>" +
+                    "Gracias por ser parte de nuestra plataforma. Queremos informarle que su rol ha sido actualizado a usuario. " +
+                    "Al ingresar a su cuenta, tendrá acceso a las herramientas y funciones básicas de la página para disfrutar de " +
+                    "nuestros servicios.<br><br>" +
+                    "Si necesita ayuda adicional o tiene alguna pregunta, no dude en ponerse en contacto con nuestro " +
+                    "equipo de soporte. Estaremos encantados de asistirle en todo lo que necesite.<br><br>" +
+                    "Atentamente,<br>" +
+                    "<span style=\"color: #F15422;\">Equipo de Resto-Reservas</span><br><br>";
+
+            emailSender.sendEmail(user.getUserEmail(), "Rol Usuario", text);
         }
 
         userRepository.save(user);
@@ -220,12 +282,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserPasswordDTO updatePassword(UserPasswordDTO userPasswordDTO,String userNameOrEmail) {
+    public UserPasswordDTO updatePassword(UserPasswordDTO userPasswordDTO, String token) {
 
-        Optional <UserModel> userOtional = userRepository
-                .findByUserEmailOrUserNameContainingIgnoreCase(userNameOrEmail, userNameOrEmail);
-        UserModel user = userOtional.orElseThrow(() -> new ResourceNotFoundException("User", "email or username", userNameOrEmail));
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
+        UserModel user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
+        String idToken = jwtTokenProvider.getUserIdFromToken(token);
+        if(idToken == null || !idToken.equals((userId))){
+            throw new AccessDeniedException("Access denied");
+        }
         user.setUserPassword(passwordEncoder.encode(userPasswordDTO.getUserPassword()));
 
         UserModel userUpdated = userRepository.save(user);
@@ -253,6 +320,18 @@ public class UserServiceImpl implements UserService {
         }
 
         String password = sb.toString();
+        String text = "Estimado " + user.getUserName() + ":<br><br>" +
+                "Hemos generado una nueva contraseña para su cuenta. A continuación, encontrará los detalles de " +
+                "inicio de sesión:<br><br>" +
+                "<span style=\"color: #F15422; font-size: 25px;\">Contraseña: " + password + "</span><br><br>" +
+                "Por favor, copie la contraseña y utilícela para iniciar sesión en su cuenta. Le recomendamos cambiarla " +
+                "una vez haya accedido a su cuenta por motivos de seguridad.<br><br>" +
+                "Si necesita ayuda adicional o tiene alguna pregunta, no dude en ponerse en contacto con nuestro equipo " +
+                "de soporte.<br><br>" +
+                "Atentamente,<br>" +
+                "<span style=\"color: #F15422;\"> Equipo de Resto-Reservas </span><br><br>";
+
+        emailSender.sendEmail(user.getUserEmail(), "Recuperación de contraseña", text);
 
         user.setUserPassword(passwordEncoder.encode(password));
 

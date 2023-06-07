@@ -20,7 +20,7 @@ public interface UserService {
 
     public UserDTO getUserById(String token);
 
-    public UserPasswordDTO updatePassword(UserPasswordDTO userPasswordDTO, String userNameOrEmail);
+    public UserPasswordDTO updatePassword(UserPasswordDTO userPasswordDTO, String token);
 
     public UserPasswordDTO forgotPassword(UserNamePassDTO userNamePassDTO);
 

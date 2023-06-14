@@ -1,4 +1,4 @@
-package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security;
+package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto;
 
 public class JwtAuthResponseDTO {
 

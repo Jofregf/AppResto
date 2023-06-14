@@ -1,6 +1,6 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.controllers;
 
-import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtAuthResponseDTO;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.JwtAuthResponseDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtTokenProvider;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.LoginDTO;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.RegisterDTO;
@@ -8,6 +8,11 @@ import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RoleMo
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.RoleRepository;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.repositories.UserRepository;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtTokenUtil;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.TokenRevocationStore;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +42,12 @@ public class AuthController {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private TokenRevocationStore tokenRevocationStore;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponseDTO> authenticateUser(@RequestBody LoginDTO loginDTO) {
@@ -75,4 +86,22 @@ public class AuthController {
         return new ResponseEntity<>("Registered user successfully", HttpStatus.OK);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        // Realiza las acciones necesarias para cerrar la sesión
+        String token = jwtTokenUtil.getJwtFromRequest(request);
+        // Limpiar la autenticación del contexto de seguridad
+        System.out.println(token + " EN LOGOUT???");
+        SecurityContextHolder.clearContext();
+        tokenRevocationStore.revokeToken(token);
+        System.out.println("HAGO LOGOUT???");
+        // Invalidar la sesión actual
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        // Devuelve una respuesta exitosa
+        return ResponseEntity.ok("Logout exitoso");
+    }
 }

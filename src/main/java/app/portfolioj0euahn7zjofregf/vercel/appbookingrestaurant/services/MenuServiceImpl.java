@@ -55,6 +55,10 @@ public class MenuServiceImpl implements MenuService{
     @Override
     public MenuDTO createMenu(MenuDTO menuDTO, String restaurantId, String token) {
 
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
+
         MenuModel menu = mapEntity(menuDTO);
 
         RestaurantModel restaurant = restaurantRepository
@@ -80,6 +84,10 @@ public class MenuServiceImpl implements MenuService{
 
     @Override
     public MenuDTO updateMenu(String restaurantId, MenuDTO menuDTO, String menuId, String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
 
         MenuModel menu = menuRepository
                 .findById(menuId)
@@ -113,6 +121,11 @@ public class MenuServiceImpl implements MenuService{
 
     @Override
     public void deleteMenu(String restaurantId, String menuId, String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
+
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
@@ -154,6 +167,10 @@ public class MenuServiceImpl implements MenuService{
 
     @Override
     public List<MenuDTO> getMenuByName(String menuName, String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
 
         String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
         if(roleToken == null || !roleToken.equals("ROLE_RESTO")){

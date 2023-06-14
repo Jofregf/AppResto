@@ -58,6 +58,10 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public ReviewDTO createReview(String restaurantId, ReviewDTO reviewDTO, String token) {
 
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
+
         ReviewModel review = mapEntity(reviewDTO);
 
         String userId = jwtTokenProvider.getUserIdFromToken(token);
@@ -86,6 +90,10 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Override
     public ReviewDTO updateReview(String reviewId, ReviewDTO reviewDTO, String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
 
         ReviewModel review = reviewRepository
                 .findById(reviewId)
@@ -116,6 +124,10 @@ public class ReviewServiceImpl implements ReviewService{
 
     @Override
     public void deleteReview(String reviewId, String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
 
         ReviewModel review = reviewRepository
                 .findById(reviewId)

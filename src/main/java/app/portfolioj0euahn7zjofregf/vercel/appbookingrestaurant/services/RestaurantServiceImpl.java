@@ -43,7 +43,7 @@ public class RestaurantServiceImpl implements RestaurantService{
     private BookingRepository bookingRepository;
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private JwtTokenProvider  jwtTokenProvider;
 
     private EmailSender emailSender;
 
@@ -135,6 +135,10 @@ public class RestaurantServiceImpl implements RestaurantService{
     @Override
     public RestaurantDTO createRestaurant(RestaurantDTO restaurantDTO, String token ) {
 
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
+
         RestaurantModel restaurant = mapEntity(restaurantDTO);
 
         String userId = jwtTokenProvider.getUserIdFromToken(token);
@@ -177,6 +181,10 @@ public class RestaurantServiceImpl implements RestaurantService{
     @Override
     public RestaurantDTO updateRestaurant(String restaurantId, RestaurantDTO restaurantDTO,
                                           String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
@@ -230,6 +238,10 @@ public class RestaurantServiceImpl implements RestaurantService{
     @Override
     public void deleteRestaurant(String restaurantId, String token) {
 
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
+
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));
@@ -267,6 +279,10 @@ public class RestaurantServiceImpl implements RestaurantService{
 
     @Override
     public RestaurantDTO updateEnabled(RestaurantDTO restaurantDTO, String restaurantId, String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
 
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
@@ -324,6 +340,10 @@ public class RestaurantServiceImpl implements RestaurantService{
     @Override
     public RestaurantDTO findRestaurantByBookingId(String bookingId, String token) {
 
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
+
         String idToken = jwtTokenProvider.getUserIdFromToken(token);
 
         Optional<BookingModel> booking = bookingRepository.findById(bookingId);
@@ -354,6 +374,10 @@ public class RestaurantServiceImpl implements RestaurantService{
 
     @Override
     public List<RestaurantDTO> findRestaurantByUserId(String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
 
         String userId = jwtTokenProvider.getUserIdFromToken(token);
 

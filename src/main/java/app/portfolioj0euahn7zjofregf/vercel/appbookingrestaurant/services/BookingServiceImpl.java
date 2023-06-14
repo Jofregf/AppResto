@@ -90,6 +90,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDTO createBooking(BookingDTO bookingDTO, String restaurantId, String token) {
 
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
+
         String idToken = jwtTokenProvider.getUserIdFromToken(token);
 
         RestaurantModel restaurant = restaurantRepository
@@ -157,6 +161,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public void deleteBooking(String bookingId, String token) {
 
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
+
         String userId = jwtTokenProvider.getUserIdFromToken(token);
 
         BookingModel booking = bookingRepository
@@ -186,6 +194,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDTO updateBooking(BookingDTO bookingDTO, String bookingId, String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
 
         String userId =  jwtTokenProvider.getUserIdFromToken(token);
 
@@ -249,6 +261,10 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingUserInfoDTO> findBookingByUserId(String token) {
 
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
+
         String userId = jwtTokenProvider.getUserIdFromToken(token);
 
         UserModel user = userRepository
@@ -273,6 +289,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDTO> findBookingByRestaurantName(String restaurantName, String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
 
         String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
         if(roleToken == null || !roleToken.equals("ROLE_RESTO")){
@@ -306,6 +326,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDTO> findByBookingDate(LocalDate date, String restaurantName, String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
 
         String roleToken = jwtTokenProvider.getUserRoleFromToken(token);
         if(roleToken == null || !roleToken.equals("ROLE_RESTO")){

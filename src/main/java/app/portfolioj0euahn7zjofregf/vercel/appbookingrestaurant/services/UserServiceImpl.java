@@ -1,6 +1,7 @@
 package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.services;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.dto.*;
+import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.RestoAppException;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security.JwtTokenProvider;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.RoleModel;
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.entities.UserModel;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -74,7 +76,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
     private EmailSender emailSender;
 
     @Autowired
@@ -112,6 +113,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO updateUser(UserDTO userDTO, String token) {
 
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
+
         String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository
                 .findById(userId)
@@ -137,6 +142,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(String token) {
 
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
+
         String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository
                 .findById(userId)
@@ -152,6 +161,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AdminUserDTO updateEnabled(AdminUserDTO adminUserDTO, String usernameOrUserEmail, String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
 
         UserModel user = userRepository.findByUserEmailOrUserNameContainingIgnoreCase(usernameOrUserEmail, usernameOrUserEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with that username or email " + usernameOrUserEmail));
@@ -192,6 +205,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AdminUserDTO updateUserRole(AdminUserDTO adminUserDTO, String usernameOrUserEmail, String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
 
         UserModel user = userRepository.findByUserEmailOrUserNameContainingIgnoreCase(usernameOrUserEmail, usernameOrUserEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with that username or email " + usernameOrUserEmail));
@@ -252,6 +269,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<AdminUserDTO> findByUserNameOrEmail(String userNameOrEmail, String token) {
 
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
+
         String userRole = jwtTokenProvider.getUserRoleFromToken(token);
         if(userRole == null || !userRole.equals("ROLE_ADMIN")){
             throw new AccessDeniedException("Access denied");
@@ -268,6 +289,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO getUserById(String token) {
 
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
+
         String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository
                 .findById(userId)
@@ -283,6 +308,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserPasswordDTO updatePassword(UserPasswordDTO userPasswordDTO, String token) {
+
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "Expired token");
+        }
 
         String userId = jwtTokenProvider.getUserIdFromToken(token);
         UserModel user = userRepository

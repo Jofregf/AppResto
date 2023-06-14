@@ -2,6 +2,7 @@ package app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.security;
 
 import app.portfolioj0euahn7zjofregf.vercel.appbookingrestaurant.exceptions.RestoAppException;
 import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,9 @@ public class JwtTokenProvider {
 
     @Value("${app.jwt-expiration-milliseconds}")
     private int jwtExpiration;
+
+    @Autowired
+    private TokenRevocationStore tokenRevocationStore;
 
     public String generateToken(Authentication authentication){
         CustomUserDetails userPrincipal = (CustomUserDetails) authentication.getPrincipal();
@@ -51,7 +55,12 @@ public class JwtTokenProvider {
         Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
         return claims.get("role").toString();
     }
+
     public boolean validateToken(String token) {
+        if (tokenRevocationStore.isTokenRevoked(token)) {
+            System.out.println("es falso en validate token???");
+            return false; // Token revocado, no es válido
+        }
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
             return true;

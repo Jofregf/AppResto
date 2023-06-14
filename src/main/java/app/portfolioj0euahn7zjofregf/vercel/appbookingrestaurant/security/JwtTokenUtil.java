@@ -8,7 +8,6 @@ import org.springframework.util.StringUtils;
 public class JwtTokenUtil {
     public String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        System.out.println(bearerToken + "getJwtFromRequest");
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")){
             return bearerToken.substring(7, bearerToken.length());
         }

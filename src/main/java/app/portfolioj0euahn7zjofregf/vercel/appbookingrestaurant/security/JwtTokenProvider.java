@@ -58,8 +58,7 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         if (tokenRevocationStore.isTokenRevoked(token)) {
-            System.out.println("es falso en validate token???");
-            return false; // Token revocado, no es válido
+            return false;
         }
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);

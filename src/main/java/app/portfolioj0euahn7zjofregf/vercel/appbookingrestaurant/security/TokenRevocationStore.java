@@ -11,11 +11,9 @@ public class TokenRevocationStore {
 
     public void revokeToken(String token) {
         revokedTokens.add(token);
-        System.out.println(revokedTokens + " SET");
     }
 
     public boolean isTokenRevoked(String token) {
-        System.out.println(revokedTokens.contains(token) + " IS TOKEN REVOKED");
         return revokedTokens.contains(token);
     }
 }

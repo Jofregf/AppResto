@@ -88,20 +88,14 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
-        // Realiza las acciones necesarias para cerrar la sesión
+
         String token = jwtTokenUtil.getJwtFromRequest(request);
-        // Limpiar la autenticación del contexto de seguridad
-        System.out.println(token + " EN LOGOUT???");
         SecurityContextHolder.clearContext();
         tokenRevocationStore.revokeToken(token);
-        System.out.println("HAGO LOGOUT???");
-        // Invalidar la sesión actual
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
         }
-
-        // Devuelve una respuesta exitosa
         return ResponseEntity.ok("Logout exitoso");
     }
 }

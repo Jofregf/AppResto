@@ -109,4 +109,11 @@ public class RestaurantController {
         String token = deleteBearerService.deleteBearerText(authorizHeader);
         return restaurantService.findRestaurantByUserId(token);
     }
+
+    @GetMapping("/admin/restaurants")
+    public RestaurantResponse restaurantsList(){
+
+        return restaurantService.getAllRestaurants();
+    }
+
 }

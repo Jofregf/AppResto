@@ -394,4 +394,18 @@ public class RestaurantServiceImpl implements RestaurantService{
         }
         return listRestaurants;
     }
+
+    @Override
+    public RestaurantResponse getAllRestaurants() {
+
+        List<RestaurantModel> restaurants = restaurantRepository.findAll();
+
+        List<RestaurantDTO> content = restaurants.stream()
+                .map(restaurant -> mapDTO(restaurant)).collect(Collectors.toList());
+
+        RestaurantResponse restaurantResponse = new RestaurantResponse();
+        restaurantResponse.setContents(content);
+
+        return restaurantResponse;
+    }
 }

@@ -62,7 +62,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.GET, "/api/restaurants", "/api/restaurants/**", "/api/menus/**",
-                        "/api/search/**").permitAll()
+                        "/api/search/**", "/api/admin/restaurants").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/users/password/**", "/api/users/forgotpassword").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/restaurants/**").hasRole("RESTO")

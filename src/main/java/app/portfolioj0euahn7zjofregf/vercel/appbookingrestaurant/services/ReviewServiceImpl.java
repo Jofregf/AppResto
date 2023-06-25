@@ -69,6 +69,9 @@ public class ReviewServiceImpl implements ReviewService{
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
+        if(user.getEnabled().equals(false)){
+            throw new RestoAppException(HttpStatus.BAD_REQUEST, "The user is banned");
+        }
         RestaurantModel restaurant = restaurantRepository
                 .findById(restaurantId)
                         .orElseThrow(() -> new ResourceNotFoundException("Restaurant", "Id", restaurantId));

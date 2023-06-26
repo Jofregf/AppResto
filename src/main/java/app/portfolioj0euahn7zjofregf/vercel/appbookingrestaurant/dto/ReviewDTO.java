@@ -18,14 +18,17 @@ public class ReviewDTO {
 
     private String userName;
 
+    private String userId;
+
     public ReviewDTO() {
     }
 
-    public ReviewDTO(String reviewId, int ratingReview, String commentReview, String userName) {
+    public ReviewDTO(String reviewId, int ratingReview, String commentReview, String userName, String userId) {
         this.reviewId = reviewId;
         this.ratingReview = ratingReview;
         this.commentReview = commentReview;
         this.userName = userName;
+        this.userId = userId;
     }
 
     public String getReviewId() {
@@ -58,6 +61,14 @@ public class ReviewDTO {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     @Override

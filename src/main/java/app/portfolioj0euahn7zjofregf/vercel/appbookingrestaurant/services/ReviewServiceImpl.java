@@ -40,6 +40,7 @@ public class ReviewServiceImpl implements ReviewService{
         reviewDTO.setRatingReview(reviewModel.getRatingReview());
         reviewDTO.setCommentReview(reviewModel.getCommentReview());
         reviewDTO.setUserName(reviewModel.getUser().getUserName());
+        reviewDTO.setUserId(reviewModel.getUser().getUserId());
 
         return reviewDTO;
     }
@@ -50,7 +51,6 @@ public class ReviewServiceImpl implements ReviewService{
         review.setReviewId(reviewDTO.getReviewId());
         review.setRatingReview(reviewDTO.getRatingReview());
         review.setCommentReview(reviewDTO.getCommentReview());
-
 
         return review;
     }

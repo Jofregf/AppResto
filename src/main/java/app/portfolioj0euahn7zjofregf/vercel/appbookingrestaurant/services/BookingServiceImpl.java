@@ -370,9 +370,6 @@ public class BookingServiceImpl implements BookingService {
             if (booking.getBookingDate().isBefore(updateActiveDate)) {
                 booking.setActive(false);
                 bookingRepository.save(booking);
-                if(booking.getBookingDate().isBefore(deleteInactiveDate)){
-                    bookingRepository.delete(booking);
-                }
             }
         }
     }

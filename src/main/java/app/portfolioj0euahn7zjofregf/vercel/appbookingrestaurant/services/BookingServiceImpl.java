@@ -364,7 +364,6 @@ public class BookingServiceImpl implements BookingService {
     public void updateBookingStatus() {
         LocalDate currentDate = LocalDate.now();
         LocalDate updateActiveDate = currentDate.minusDays(7);
-        LocalDate deleteInactiveDate = currentDate.minusDays(30);
         List<BookingModel> bookings = bookingRepository.findAll();
         for (BookingModel booking : bookings) {
             if (booking.getBookingDate().isBefore(updateActiveDate)) {
